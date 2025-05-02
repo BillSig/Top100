@@ -1,0 +1,123 @@
+﻿namespace ExcelEditor
+{
+    partial class FrmMain
+    {
+        /// <summary>
+        ///  Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        ///  Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        ///  Required method for Designer support - do not modify
+        ///  the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            pnlTop = new Panel();
+            txtFileName = new TextBox();
+            btnOpen = new Button();
+            pnlMain = new Panel();
+            grdMain = new DataGridView();
+            openFileDialog1 = new OpenFileDialog();
+            pnlTop.SuspendLayout();
+            pnlMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)grdMain).BeginInit();
+            SuspendLayout();
+            // 
+            // pnlTop
+            // 
+            pnlTop.Controls.Add(txtFileName);
+            pnlTop.Controls.Add(btnOpen);
+            pnlTop.Dock = DockStyle.Top;
+            pnlTop.Location = new Point(0, 0);
+            pnlTop.Name = "pnlTop";
+            pnlTop.Size = new Size(856, 52);
+            pnlTop.TabIndex = 0;
+            // 
+            // txtFileName
+            // 
+            txtFileName.Location = new Point(12, 12);
+            txtFileName.Name = "txtFileName";
+            txtFileName.Size = new Size(732, 27);
+            txtFileName.TabIndex = 1;
+            // 
+            // btnOpen
+            // 
+            btnOpen.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnOpen.Location = new Point(750, 12);
+            btnOpen.Name = "btnOpen";
+            btnOpen.Size = new Size(94, 29);
+            btnOpen.TabIndex = 0;
+            btnOpen.Text = "Load Excel file";
+            btnOpen.UseVisualStyleBackColor = true;
+            btnOpen.Click += this.btnOpen_Click;
+            // 
+            // pnlMain
+            // 
+            pnlMain.Controls.Add(grdMain);
+            pnlMain.Dock = DockStyle.Fill;
+            pnlMain.Location = new Point(0, 52);
+            pnlMain.Name = "pnlMain";
+            pnlMain.Size = new Size(856, 309);
+            pnlMain.TabIndex = 1;
+            // 
+            // grdMain
+            // 
+            grdMain.AllowUserToAddRows = false;
+            grdMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            grdMain.Dock = DockStyle.Fill;
+            grdMain.Location = new Point(0, 0);
+            grdMain.Name = "grdMain";
+            grdMain.ReadOnly = true;
+            grdMain.RowHeadersWidth = 51;
+            grdMain.Size = new Size(856, 309);
+            grdMain.TabIndex = 0;
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "dlgOpenFile";
+            // 
+            // FrmMain
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(856, 361);
+            Controls.Add(pnlMain);
+            Controls.Add(pnlTop);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Name = "FrmMain";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Excel Editor";
+            WindowState = FormWindowState.Maximized;
+            pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
+            pnlMain.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)grdMain).EndInit();
+            ResumeLayout(false);
+        }
+
+        #endregion
+
+        private Panel pnlTop;
+        private Button btnOpen;
+        private Panel pnlMain;
+        private DataGridView grdMain;
+        private OpenFileDialog openFileDialog1;
+        private TextBox txtFileName;
+    }
+}
