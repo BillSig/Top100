@@ -65,7 +65,7 @@
             btnOpen.TabIndex = 0;
             btnOpen.Text = "Load Excel file";
             btnOpen.UseVisualStyleBackColor = true;
-            btnOpen.Click += this.btnOpen_Click;
+            btnOpen.Click += btnOpen_Click;
             // 
             // pnlMain
             // 
@@ -79,12 +79,14 @@
             // grdMain
             // 
             grdMain.AllowUserToAddRows = false;
+            grdMain.AllowUserToDeleteRows = false;
             grdMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             grdMain.Dock = DockStyle.Fill;
             grdMain.Location = new Point(0, 0);
             grdMain.Name = "grdMain";
             grdMain.ReadOnly = true;
             grdMain.RowHeadersWidth = 51;
+            grdMain.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             grdMain.Size = new Size(856, 309);
             grdMain.TabIndex = 0;
             // 
