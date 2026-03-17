@@ -41,9 +41,13 @@ namespace ExcelEditor
 
             // Header row
             var headerRow = sheet.GetRow(sheet.FirstRowNum);
-            for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum; c++)
+            for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum && !headerRow.GetCell(c).StringCellValue.Contains("Column"); c++)
             {
-                dt.Columns.Add(headerRow.GetCell(c).ToString());
+                // Set the first column ("Position") as int, others as string
+                if (c == 0)
+                    dt.Columns.Add(headerRow.GetCell(c).ToString(), typeof(int));
+                else
+                    dt.Columns.Add(headerRow.GetCell(c).ToString(), typeof(string));
             }
 
             // Data rows
@@ -52,16 +56,40 @@ namespace ExcelEditor
                 var row = sheet.GetRow(r);
                 if (row == null)
                 {
-                    continue; // skip empty
+                    continue; // skip empty row object
                 }
 
+                bool isEmpty = true;
                 var dr = dt.NewRow();
                 for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum; c++)
                 {
-                    dr[c] = row.GetCell(c)?.ToString() ?? string.Empty;
+                    var cell = row.GetCell(c);
+                    if (cell != null && !string.IsNullOrWhiteSpace(cell.ToString()))
+                    {
+                        isEmpty = false;
+                    }
+
+                    if (cell != null)
+                    {
+                        if (c == 0)
+                        {
+                            // Parse as int for the "Position" column
+                            if (int.TryParse(cell.ToString(), out int pos))
+                                dr[c] = pos;
+                            else
+                                dr[c] = DBNull.Value;
+                        }
+                        else
+                        {
+                            dr[c] = cell.ToString();
+                        }
+                    }
                 }
 
-                dt.Rows.Add(dr);
+                if (!isEmpty)
+                {
+                    dt.Rows.Add(dr);
+                }
             }
 
             table = dt;
