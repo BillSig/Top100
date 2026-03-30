@@ -6,8 +6,13 @@ https://chatgpt.com/c/680a5868-cd48-8009-9374-901d999f682e
 Excel file can be found at 
 -	E:\Personal\Personal
 -	D:\Personal
+-	D:\BILL SIG\DEV\GitHub\BillSig\Top100
 -	Dell Laptop desktop 
 Dell Laptop is the up to date xls file 
+
+Videos found in
+-	C:\Users\Windows 11\Videos\Top100
+
 
 Ways to download videos from Youtube:
 https://chat.deepseek.com/a/chat/s/1af0bd03-81e9-4239-803b-a2e641e3d39c
@@ -51,3 +56,15 @@ Technical Specifications
 	All CRUD functionality would be available.
 	Filtering and ordering is a great nice-to-have feature
 	Excel file should not exceed 500 rows.
+	
+TODO List:
+-	Functionality
+	o	Update Button: next to Load Excel button. Upon click, the file is saved as is. If no changes exist, it remains disabled.
+	o	Up and Down Arrow buttons: replaces the selected record upwards or downwards respectively. Changes are not automatically saved.
+	o	Discard Button: discards all changes after user’s confirmation.
+	o	Edit Button (Double click a row): A modal form opens with the record data. User may edit all values except Position. OK/Cancel buttons on the modal ensures that the changes are kept in memory. They are not saved however, until user clicks on Update button.
+	o	Show that changes are not saved: Update Button becomes enabled
+	o	Load Button: show warning if there are any unsaved data.
+-	Validation
+	o	Excel file should not exceed 500 rows. A warning should be displayed in a modal window when loading the file and before saving it. 
+	o	Saving changes will not be allowed if file exceeds 500 rows.
