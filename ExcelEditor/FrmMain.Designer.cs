@@ -107,6 +107,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Excel Editor";
             WindowState = FormWindowState.Maximized;
+            Load += FrmMain_Load;
             pnlTop.ResumeLayout(false);
             pnlTop.PerformLayout();
             pnlMain.ResumeLayout(false);

@@ -1,6 +1,7 @@
 using ExcelEditorLibrary.Models;
 using NPOI.SS.UserModel;
 using System.Data;
+using System.Reflection;
 
 namespace ExcelEditor
 {
@@ -120,7 +121,7 @@ namespace ExcelEditor
                 //{
                 //    table.Rows[e.RowIndex][col.ColumnName] = values[col.ColumnName];
                 //}
-                    
+
 
                 // 2) write that row back to Excel
                 //SaveRow(e.RowIndex);
@@ -163,7 +164,7 @@ namespace ExcelEditor
 
                 //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "")
                 //?? row.CreateCell(c).SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
-            }   
+            }
 
             // overwrite file
             using var outFs = new FileStream(excelPath, FileMode.Create, FileAccess.Write);
@@ -195,6 +196,22 @@ namespace ExcelEditor
             // Overwrite file
             using var outFs = new FileStream(path, FileMode.Create, FileAccess.Write);
             wb.Write(outFs);
+        }
+
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
+            // Read version from Assembly (setup in project file)
+            this.Text = $"Excel Editor - {Application.ProductVersion}";
+            
+            // Altrnatively, include last GitHub commit SHA in version:
+            // Remove the following line in project file:
+            // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+            //string versionStr = Assembly.GetExecutingAssembly()
+            //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+            //this.Text = $"Excel Editor - {versionStr}";
+
+
         }
     }
 }
