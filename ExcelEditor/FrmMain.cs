@@ -1,3 +1,4 @@
+using ExcelEditorLibrary.Models;
 using NPOI.SS.UserModel;
 using System.Data;
 
@@ -94,6 +95,79 @@ namespace ExcelEditor
 
             table = dt;
             grdMain.DataSource = table;
+        }
+
+        private void Grid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            EditRow(sender, e);
+        }
+
+        private void EditRow(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return; // header
+
+            // Get selected row
+            GreatestHitModel currentGreatestHit = GetSelectedGreatestHit(e.RowIndex);
+
+            // show edit form
+            using var editForm = new FrmEditRow(currentGreatestHit);
+            var result = editForm.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                // 1) update DataTable
+                //var values = editForm.EditedValues;
+                //foreach (DataColumn col in table.Columns)
+                //{
+                //    table.Rows[e.RowIndex][col.ColumnName] = values[col.ColumnName];
+                //}
+                    
+
+                // 2) write that row back to Excel
+                //SaveRow(e.RowIndex);
+            }
+        }
+
+        private GreatestHitModel GetSelectedGreatestHit(int rowIndex)
+        {
+            // grab current values
+            var selectedRow = table.Rows[rowIndex]
+                                   .ItemArray
+                                   .Select(o => o?.ToString() ?? "")
+                                   .ToList();
+            GreatestHitModel currentGreatestHit = new GreatestHitModel()
+            {
+                Position = int.Parse(selectedRow[0]),
+                BandName = selectedRow[1],
+                SongTitle = selectedRow[2],
+                VideoLink = selectedRow[3],
+                IsViewed = int.Parse(selectedRow[4]) == 1
+            };
+
+            return currentGreatestHit;
+        }
+
+        private void SaveRow(int rowIndex)
+        {
+            IWorkbook wb;
+            using (var fs = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                wb = WorkbookFactory.Create(fs);
+
+            var sheet = wb.GetSheetAt(0);
+            int hdrRow = sheet.FirstRowNum;
+            int sheetRow = hdrRow + 1 + rowIndex;
+            var row = sheet.GetRow(sheetRow) ?? sheet.CreateRow(sheetRow);
+
+            for (int c = 0; c < table.Columns.Count; c++)
+            {
+                //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+
+                //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "")
+                //?? row.CreateCell(c).SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+            }   
+
+            // overwrite file
+            using var outFs = new FileStream(excelPath, FileMode.Create, FileAccess.Write);
+            wb.Write(outFs);
         }
 
         private void SaveGridToExcel(string path)

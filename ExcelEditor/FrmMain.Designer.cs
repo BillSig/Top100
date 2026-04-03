@@ -89,6 +89,7 @@
             grdMain.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             grdMain.Size = new Size(856, 309);
             grdMain.TabIndex = 0;
+            grdMain.CellDoubleClick += Grid_CellDoubleClick;
             // 
             // openFileDialog1
             // 
