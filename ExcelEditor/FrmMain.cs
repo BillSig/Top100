@@ -9,6 +9,7 @@ namespace ExcelEditor
     {
         private string excelPath;
         private DataTable table;
+        private List<GreatestHitModel> greatestHits = new();
 
         public FrmMain()
         {
@@ -27,6 +28,31 @@ namespace ExcelEditor
             excelPath = dlg.FileName;
             txtFileName.Text = excelPath;
             LoadExcelToGrid(excelPath);
+            LoadGreatestHits();
+        }
+
+        private void LoadGreatestHits()
+        {
+            greatestHits.Clear();
+
+            foreach (DataRow dr in table.Rows)
+            {
+                try
+                {
+                    greatestHits.Add(new GreatestHitModel
+                    {
+                        Position = dr[0] == DBNull.Value || string.IsNullOrWhiteSpace(dr[0].ToString()) ? 0 : Convert.ToInt32(dr[0]),
+                        BandName = dr[1].ToString(),
+                        SongTitle = dr[2].ToString(),
+                        VideoLink = dr[3].ToString(),
+                        IsViewed = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"There was an error while parsing excel file in line {dr[0].ToString()}. Fix the file and reopen! Error: {ex.Message}", "Error", MessageBoxButtons.OK);
+                }
+            }
         }
 
         private void LoadExcelToGrid(string excelPath)
@@ -107,15 +133,23 @@ namespace ExcelEditor
         {
             if (e.RowIndex < 0) return; // header
 
-            // Get selected row
-            GreatestHitModel currentGreatestHit = GetSelectedGreatestHit(e.RowIndex);
+            ///// Get selected row directly from in-memory excel file
+            //GreatestHitModel currentGreatestHit = GetSelectedGreatestHit(e.RowIndex);
+
+            // Get selected row from the list
+            GreatestHitModel currentGreatestHit = greatestHits[e.RowIndex];
 
             // show edit form
             using var editForm = new FrmEditRow(currentGreatestHit);
             var result = editForm.ShowDialog();
             if (result == DialogResult.OK)
             {
-                // 1) update DataTable
+                // Update DataTable from currentGreatestHit. It is passed by reference so it is already updated!
+                table.Rows[e.RowIndex][1] = currentGreatestHit.BandName;
+                table.Rows[e.RowIndex][2] = currentGreatestHit.SongTitle;
+                table.Rows[e.RowIndex][3] = currentGreatestHit.VideoLink;
+                table.Rows[e.RowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
+
                 //var values = editForm.EditedValues;
                 //foreach (DataColumn col in table.Columns)
                 //{

@@ -36,7 +36,16 @@ namespace ExcelEditor
         private void btnOK_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
+            UpdateCurrentGreatestHit();
             Close();
+        }
+
+        private void UpdateCurrentGreatestHit()
+        {
+            _CurrentGreatestHit.BandName = txtBandName.Text;
+            _CurrentGreatestHit.SongTitle = txtSongTitle.Text;
+            _CurrentGreatestHit.VideoLink = txtVideoLink.Text;
+            _CurrentGreatestHit.IsViewed = chkIsViewed.Checked;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
