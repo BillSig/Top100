@@ -10,6 +10,7 @@ namespace ExcelEditor
         private string excelPath;
         private DataTable table;
         private List<GreatestHitModel> greatestHits = new();
+        private bool hasUnsavedChanges = false;
 
         public FrmMain()
         {
@@ -150,6 +151,8 @@ namespace ExcelEditor
                 table.Rows[e.RowIndex][3] = currentGreatestHit.VideoLink;
                 table.Rows[e.RowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
 
+                UpdateUIRow(e.RowIndex, true);
+
                 //var values = editForm.EditedValues;
                 //foreach (DataColumn col in table.Columns)
                 //{
@@ -159,6 +162,20 @@ namespace ExcelEditor
 
                 // 2) write that row back to Excel
                 //SaveRow(e.RowIndex);
+            }
+        }
+
+        private void UpdateUIRow(int rowIndex, bool recordhasChanged)
+        {
+            hasUnsavedChanges = recordhasChanged;
+            btnSave.Enabled = recordhasChanged;
+            if (recordhasChanged)
+            {
+                grdMain.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
+            }
+            else
+            {
+                grdMain.Rows[rowIndex].DefaultCellStyle.BackColor = Color.White;
             }
         }
 
@@ -205,38 +222,52 @@ namespace ExcelEditor
             wb.Write(outFs);
         }
 
-        private void SaveGridToExcel(string path)
+        private bool SaveGridToExcel(string path)
         {
-            IWorkbook wb;
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                wb = WorkbookFactory.Create(fs);
+            bool result = false;
 
-            var sheet = wb.GetSheetAt(0);
-            int rowCount = table.Rows.Count;
-
-            // Clear out existing data rows (but keep header)
-            for (int r = sheet.LastRowNum; r > sheet.FirstRowNum; r--)
-                sheet.RemoveRow(sheet.GetRow(r));
-
-            // Write updated rows
-            for (int i = 0; i < rowCount; i++)
+            try
             {
-                var dr = table.Rows[i];
-                var row = sheet.CreateRow(i + sheet.FirstRowNum + 1);
-                for (int c = 0; c < table.Columns.Count; c++)
-                    row.CreateCell(c).SetCellValue(dr[c]?.ToString() ?? "");
+                IWorkbook wb;
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    wb = WorkbookFactory.Create(fs);
+
+                var sheet = wb.GetSheetAt(0);
+                int rowCount = table.Rows.Count;
+
+                // Clear out existing data rows (but keep header)
+                for (int r = sheet.LastRowNum; r > sheet.FirstRowNum; r--)
+                    sheet.RemoveRow(sheet.GetRow(r));
+
+                // Write updated rows
+                for (int i = 0; i < rowCount; i++)
+                {
+                    var dr = table.Rows[i];
+                    var row = sheet.CreateRow(i + sheet.FirstRowNum + 1);
+                    for (int c = 0; c < table.Columns.Count; c++)
+                        row.CreateCell(c).SetCellValue(dr[c]?.ToString() ?? "");
+                }
+
+                // Overwrite file
+                using var outFs = new FileStream(path, FileMode.Create, FileAccess.Write);
+                wb.Write(outFs);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error while sving excel file: {ex.Message}");
             }
 
-            // Overwrite file
-            using var outFs = new FileStream(path, FileMode.Create, FileAccess.Write);
-            wb.Write(outFs);
+            return result;
         }
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
             // Read version from Assembly (setup in project file)
             this.Text = $"Excel Editor - {Application.ProductVersion}";
-            
+
+            btnSave.Enabled = false;
+
             // Altrnatively, include last GitHub commit SHA in version:
             // Remove the following line in project file:
             // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
@@ -244,8 +275,48 @@ namespace ExcelEditor
             //string versionStr = Assembly.GetExecutingAssembly()
             //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
             //this.Text = $"Excel Editor - {versionStr}";
+        }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (SaveGridToExcel(excelPath))
+            {
+                MessageBox.Show("Excel file saved successfully!", "Success", MessageBoxButtons.OK);
 
+                hasUnsavedChanges = false;
+                btnSave.Enabled = false;
+                foreach (DataGridViewRow row in grdMain.Rows)
+                {
+                    row.DefaultCellStyle.BackColor = Color.White;
+                }
+            }
+        }
+
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (hasUnsavedChanges)
+            {
+                var result = MessageBox.Show(
+                    "You have unsaved changes. Do you want to save before exiting?",
+                    "Unsaved Changes",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    if (!SaveGridToExcel(excelPath))
+                    {
+                        // If save failed, cancel closing
+                        e.Cancel = true;
+                    }
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+
+                // If No, just close without saving
+            }
         }
     }
 }

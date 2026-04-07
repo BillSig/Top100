@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             pnlTop = new Panel();
+            btnSave = new Button();
             txtFileName = new TextBox();
             btnOpen = new Button();
             pnlMain = new Panel();
@@ -41,6 +42,7 @@
             // 
             // pnlTop
             // 
+            pnlTop.Controls.Add(btnSave);
             pnlTop.Controls.Add(txtFileName);
             pnlTop.Controls.Add(btnOpen);
             pnlTop.Dock = DockStyle.Top;
@@ -49,11 +51,22 @@
             pnlTop.Size = new Size(856, 52);
             pnlTop.TabIndex = 0;
             // 
+            // btnSave
+            // 
+            btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnSave.Location = new Point(651, 10);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(94, 29);
+            btnSave.TabIndex = 2;
+            btnSave.Text = "Save Excel file";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
+            // 
             // txtFileName
             // 
             txtFileName.Location = new Point(12, 12);
             txtFileName.Name = "txtFileName";
-            txtFileName.Size = new Size(732, 27);
+            txtFileName.Size = new Size(633, 27);
             txtFileName.TabIndex = 1;
             // 
             // btnOpen
@@ -107,6 +120,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Excel Editor";
             WindowState = FormWindowState.Maximized;
+            FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
             pnlTop.ResumeLayout(false);
             pnlTop.PerformLayout();
@@ -123,5 +137,6 @@
         private DataGridView grdMain;
         private OpenFileDialog openFileDialog1;
         private TextBox txtFileName;
+        private Button btnSave;
     }
 }
