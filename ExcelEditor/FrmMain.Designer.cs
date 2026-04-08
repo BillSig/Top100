@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             pnlTop = new Panel();
+            btnDiscard = new Button();
             btnSave = new Button();
             txtFileName = new TextBox();
             btnOpen = new Button();
@@ -42,6 +43,7 @@
             // 
             // pnlTop
             // 
+            pnlTop.Controls.Add(btnDiscard);
             pnlTop.Controls.Add(btnSave);
             pnlTop.Controls.Add(txtFileName);
             pnlTop.Controls.Add(btnOpen);
@@ -51,6 +53,17 @@
             pnlTop.Size = new Size(856, 52);
             pnlTop.TabIndex = 0;
             // 
+            // btnDiscard
+            // 
+            btnDiscard.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnDiscard.Location = new Point(750, 10);
+            btnDiscard.Name = "btnDiscard";
+            btnDiscard.Size = new Size(94, 29);
+            btnDiscard.TabIndex = 3;
+            btnDiscard.Text = "Discard Changes";
+            btnDiscard.UseVisualStyleBackColor = true;
+            btnDiscard.Click += btnDiscard_Click;
+            // 
             // btnSave
             // 
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
@@ -58,7 +71,7 @@
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(94, 29);
             btnSave.TabIndex = 2;
-            btnSave.Text = "Save Excel file";
+            btnSave.Text = "Save file";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
             // 
@@ -66,13 +79,13 @@
             // 
             txtFileName.Location = new Point(12, 12);
             txtFileName.Name = "txtFileName";
-            txtFileName.Size = new Size(633, 27);
+            txtFileName.Size = new Size(533, 27);
             txtFileName.TabIndex = 1;
             // 
             // btnOpen
             // 
             btnOpen.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnOpen.Location = new Point(750, 12);
+            btnOpen.Location = new Point(551, 10);
             btnOpen.Name = "btnOpen";
             btnOpen.Size = new Size(94, 29);
             btnOpen.TabIndex = 0;
@@ -138,5 +151,6 @@
         private OpenFileDialog openFileDialog1;
         private TextBox txtFileName;
         private Button btnSave;
+        private Button btnDiscard;
     }
 }

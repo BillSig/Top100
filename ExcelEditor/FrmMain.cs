@@ -178,7 +178,7 @@ namespace ExcelEditor
         private void UpdateUIRow(int rowIndex, bool recordhasChanged)
         {
             hasUnsavedChanges = recordhasChanged;
-            btnSave.Enabled = recordhasChanged;
+            UpdateButtons(recordhasChanged);
             if (recordhasChanged)
             {
                 grdMain.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
@@ -276,7 +276,7 @@ namespace ExcelEditor
             // Read version from Assembly (setup in project file)
             this.Text = $"Excel Editor - {Application.ProductVersion}";
 
-            btnSave.Enabled = false;
+            UpdateButtons(false);
 
             // Altrnatively, include last GitHub commit SHA in version:
             // Remove the following line in project file:
@@ -293,8 +293,7 @@ namespace ExcelEditor
             {
                 MessageBox.Show("Excel file saved successfully!", "Success", MessageBoxButtons.OK);
 
-                hasUnsavedChanges = false;
-                btnSave.Enabled = false;
+                UpdateButtons(false);
                 foreach (DataGridViewRow row in grdMain.Rows)
                 {
                     row.DefaultCellStyle.BackColor = Color.White;
@@ -328,5 +327,27 @@ namespace ExcelEditor
                 // If No, just close without saving
             }
         }
+
+        private void btnDiscard_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                    "Are you sure that you want to discard unsaved changes? This action cannot be undone.",
+                    "Unsaved Changes",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                LoadExcelToGrid(excelPath);
+                UpdateButtons(false);
+            }
+        }
+
+        private void UpdateButtons(bool hasChanges)
+        {
+            hasUnsavedChanges = hasChanges;
+            btnSave.Enabled = hasChanges;
+            btnDiscard.Enabled = hasChanges;
+        }   
     }
 }
