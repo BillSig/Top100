@@ -19,6 +19,16 @@ namespace ExcelEditor
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
+            if (hasUnsavedChanges)
+            {
+                var result = MessageBox.Show(
+                    "You have unsaved changes. Save file first!",
+                    "Unsaved Changes",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
             using var dlg = new OpenFileDialog()
             {
                 Filter = "Excel Files|*.xlsx;*.xls",
