@@ -17,6 +17,23 @@ namespace ExcelEditor
             InitializeComponent();
         }
 
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
+            // Read version from Assembly (setup in project file)
+            this.Text = $"Excel Editor - {Application.ProductVersion}";
+
+            UpdateButtons(false);
+            UpdateArrows(false);
+
+            // Altrnatively, include last GitHub commit SHA in version:
+            // Remove the following line in project file:
+            // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+            //string versionStr = Assembly.GetExecutingAssembly()
+            //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+            //this.Text = $"Excel Editor - {versionStr}";
+        }
+
         private void btnOpen_Click(object sender, EventArgs e)
         {
             if (hasUnsavedChanges)
@@ -271,22 +288,6 @@ namespace ExcelEditor
             return result;
         }
 
-        private void FrmMain_Load(object sender, EventArgs e)
-        {
-            // Read version from Assembly (setup in project file)
-            this.Text = $"Excel Editor - {Application.ProductVersion}";
-
-            UpdateButtons(false);
-
-            // Altrnatively, include last GitHub commit SHA in version:
-            // Remove the following line in project file:
-            // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-
-            //string versionStr = Assembly.GetExecutingAssembly()
-            //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
-            //this.Text = $"Excel Editor - {versionStr}";
-        }
-
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (SaveGridToExcel(excelPath))
@@ -348,6 +349,93 @@ namespace ExcelEditor
             hasUnsavedChanges = hasChanges;
             btnSave.Enabled = hasChanges;
             btnDiscard.Enabled = hasChanges;
-        }   
+        }
+
+        private void UpdateArrows(bool isRowSelected)
+        {
+            btnMoveDown.Enabled = isRowSelected;
+            btnMoveUp.Enabled = isRowSelected;
+        }
+
+        private void grdMain_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            UpdateArrows(e.RowIndex >= 0);
+        }
+
+        private void btnMoveUp_Click(object sender, EventArgs e)
+        {
+            if (grdMain.CurrentCell == null) return;
+            int rowIndex = grdMain.CurrentCell.RowIndex;
+
+            // Only allow moving if not header and not the first data row
+            if (rowIndex < 1) return;
+
+            SwapRowData(rowIndex, rowIndex - 1);
+
+            // Swap in greatestHits except Position
+            SwapGreatestHitData(rowIndex, rowIndex - 1);
+
+            UpdateUIRow(rowIndex, true);
+            UpdateUIRow(rowIndex - 1, true);
+
+            grdMain.ClearSelection();
+            grdMain.Rows[rowIndex - 1].Selected = true;
+            grdMain.CurrentCell = grdMain.Rows[rowIndex - 1].Cells[0];
+
+            UpdateButtons(true);
+        }
+
+        private void btnMoveDown_Click(object sender, EventArgs e)
+        {
+            if (grdMain.CurrentRow == null) return;
+            int rowIndex = grdMain.CurrentRow.Index;
+
+            // Only allow moving if not header and not the last row
+            if (rowIndex < 0 || rowIndex >= table.Rows.Count - 1) return;
+
+            SwapRowData(rowIndex, rowIndex + 1);
+
+            // Swap in greatestHits except Position
+            SwapGreatestHitData(rowIndex, rowIndex + 1);
+
+            UpdateUIRow(rowIndex, true);
+            UpdateUIRow(rowIndex + 1, true);
+
+            grdMain.ClearSelection();
+            grdMain.Rows[rowIndex + 1].Selected = true;
+            grdMain.CurrentCell = grdMain.Rows[rowIndex + 1].Cells[0];
+
+            UpdateButtons(true);
+        }
+
+        // Swap all columns except the first (Position)
+        private void SwapRowData(int rowA, int rowB)
+        {
+            for (int col = 1; col <= 4; col++)
+            {
+                var temp = table.Rows[rowA][col];
+                table.Rows[rowA][col] = table.Rows[rowB][col];
+                table.Rows[rowB][col] = temp;
+            }
+        }
+
+        // Swap GreatestHitModel data except Position
+        private void SwapGreatestHitData(int indexA, int indexB)
+        {
+            var tempBand = greatestHits[indexA].BandName;
+            var tempSong = greatestHits[indexA].SongTitle;
+            var tempVideo = greatestHits[indexA].VideoLink;
+            var tempViewed = greatestHits[indexA].IsViewed;
+
+            greatestHits[indexA].BandName = greatestHits[indexB].BandName;
+            greatestHits[indexA].SongTitle = greatestHits[indexB].SongTitle;
+            greatestHits[indexA].VideoLink = greatestHits[indexB].VideoLink;
+            greatestHits[indexA].IsViewed = greatestHits[indexB].IsViewed;
+
+            greatestHits[indexB].BandName = tempBand;
+            greatestHits[indexB].SongTitle = tempSong;
+            greatestHits[indexB].VideoLink = tempVideo;
+            greatestHits[indexB].IsViewed = tempViewed;
+        }
     }
 }

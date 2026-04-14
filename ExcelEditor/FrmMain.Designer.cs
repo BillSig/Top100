@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             pnlTop = new Panel();
+            btnMoveUp = new Button();
+            btnMoveDown = new Button();
             btnDiscard = new Button();
             btnSave = new Button();
             txtFileName = new TextBox();
@@ -43,6 +45,8 @@
             // 
             // pnlTop
             // 
+            pnlTop.Controls.Add(btnMoveUp);
+            pnlTop.Controls.Add(btnMoveDown);
             pnlTop.Controls.Add(btnDiscard);
             pnlTop.Controls.Add(btnSave);
             pnlTop.Controls.Add(txtFileName);
@@ -50,13 +54,35 @@
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(856, 52);
+            pnlTop.Size = new Size(1242, 96);
             pnlTop.TabIndex = 0;
+            // 
+            // btnMoveUp
+            // 
+            btnMoveUp.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnMoveUp.Location = new Point(1045, 56);
+            btnMoveUp.Name = "btnMoveUp";
+            btnMoveUp.Size = new Size(94, 29);
+            btnMoveUp.TabIndex = 5;
+            btnMoveUp.Text = "↑";
+            btnMoveUp.UseVisualStyleBackColor = true;
+            btnMoveUp.Click += btnMoveUp_Click;
+            // 
+            // btnMoveDown
+            // 
+            btnMoveDown.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnMoveDown.Location = new Point(945, 56);
+            btnMoveDown.Name = "btnMoveDown";
+            btnMoveDown.Size = new Size(94, 29);
+            btnMoveDown.TabIndex = 4;
+            btnMoveDown.Text = "↓";
+            btnMoveDown.UseVisualStyleBackColor = true;
+            btnMoveDown.Click += btnMoveDown_Click;
             // 
             // btnDiscard
             // 
             btnDiscard.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnDiscard.Location = new Point(750, 10);
+            btnDiscard.Location = new Point(1148, 11);
             btnDiscard.Name = "btnDiscard";
             btnDiscard.Size = new Size(94, 29);
             btnDiscard.TabIndex = 3;
@@ -67,7 +93,7 @@
             // btnSave
             // 
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnSave.Location = new Point(651, 10);
+            btnSave.Location = new Point(1045, 11);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(94, 29);
             btnSave.TabIndex = 2;
@@ -85,7 +111,7 @@
             // btnOpen
             // 
             btnOpen.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnOpen.Location = new Point(551, 10);
+            btnOpen.Location = new Point(945, 11);
             btnOpen.Name = "btnOpen";
             btnOpen.Size = new Size(94, 29);
             btnOpen.TabIndex = 0;
@@ -97,9 +123,9 @@
             // 
             pnlMain.Controls.Add(grdMain);
             pnlMain.Dock = DockStyle.Fill;
-            pnlMain.Location = new Point(0, 52);
+            pnlMain.Location = new Point(0, 96);
             pnlMain.Name = "pnlMain";
-            pnlMain.Size = new Size(856, 309);
+            pnlMain.Size = new Size(1242, 509);
             pnlMain.TabIndex = 1;
             // 
             // grdMain
@@ -113,8 +139,9 @@
             grdMain.ReadOnly = true;
             grdMain.RowHeadersWidth = 51;
             grdMain.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grdMain.Size = new Size(856, 309);
+            grdMain.Size = new Size(1242, 509);
             grdMain.TabIndex = 0;
+            grdMain.CellClick += grdMain_CellClick;
             grdMain.CellDoubleClick += Grid_CellDoubleClick;
             // 
             // openFileDialog1
@@ -125,7 +152,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(856, 361);
+            ClientSize = new Size(1242, 605);
             Controls.Add(pnlMain);
             Controls.Add(pnlTop);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -152,5 +179,7 @@
         private TextBox txtFileName;
         private Button btnSave;
         private Button btnDiscard;
+        private Button btnMoveUp;
+        private Button btnMoveDown;
     }
 }
