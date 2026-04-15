@@ -55,8 +55,10 @@ namespace ExcelEditor
 
             excelPath = dlg.FileName;
             txtFileName.Text = excelPath;
-            LoadExcelToGrid(excelPath);
-            LoadGreatestHits();
+            if (LoadExcelToGrid(excelPath))
+            {
+                LoadGreatestHits();
+            }
         }
 
         private void LoadGreatestHits()
@@ -83,7 +85,7 @@ namespace ExcelEditor
             }
         }
 
-        private void LoadExcelToGrid(string excelPath)
+        private bool LoadExcelToGrid(string excelPath)
         {
             IWorkbook wb;
             using (var fs = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -93,6 +95,12 @@ namespace ExcelEditor
             }
 
             var sheet = wb.GetSheetAt(0);
+            if (!ValidateSheet(sheet, out var errors))
+            {
+                MessageBox.Show(string.Join(Environment.NewLine, errors), "Invalid Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
             var dt = new DataTable(sheet.SheetName);
 
             // Header row
@@ -150,6 +158,41 @@ namespace ExcelEditor
 
             table = dt;
             grdMain.DataSource = table;
+            return true;
+        }
+
+        private bool ValidateSheet(ISheet sheet, out string[] errors)
+        {
+            var errorList = new List<string>();
+
+            if (sheet == null)
+            {
+                errorList.Add("The selected Excel file does not contain any sheets.");
+            }
+            else
+            {
+                var headerRow = sheet.GetRow(sheet.FirstRowNum);
+
+                if (headerRow == null)
+                {
+                    errorList.Add("The selected Excel file does not contain a header row. Please select a valid file.");
+                }
+                else
+                {
+                    if (headerRow.LastCellNum < 5)
+                    {
+                        errorList.Add("The header row must contain at least 5 columns.");
+                    }   
+                }
+
+                if (sheet.Count() > 500)
+                {
+                    errorList.Add("The selected Excel file contains more than 500 rows.");
+                }
+            }
+
+            errors = errorList.ToArray();
+            return errors.Length == 0;
         }
 
         private void Grid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -260,6 +303,12 @@ namespace ExcelEditor
                     wb = WorkbookFactory.Create(fs);
 
                 var sheet = wb.GetSheetAt(0);
+                if (!ValidateSheet(sheet, out var errors))
+                {
+                    MessageBox.Show(string.Join(Environment.NewLine, errors), "Invalid Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
                 int rowCount = table.Rows.Count;
 
                 // Clear out existing data rows (but keep header)
