@@ -2,6 +2,7 @@ using ExcelEditorLibrary.Models;
 using NPOI.SS.UserModel;
 using System.Data;
 using System.Reflection;
+using System.Text.Json;
 
 namespace ExcelEditor
 {
@@ -11,6 +12,7 @@ namespace ExcelEditor
         private DataTable table;
         private List<GreatestHitModel> greatestHits = new();
         private bool hasUnsavedChanges = false;
+        private AppConfig appConfig;
 
         public FrmMain()
         {
@@ -20,10 +22,25 @@ namespace ExcelEditor
         private void FrmMain_Load(object sender, EventArgs e)
         {
             // Read version from Assembly (setup in project file)
-            this.Text = $"Excel Editor - {Application.ProductVersion}";
+            ShowVersion();
 
-            UpdateButtons(false);
-            UpdateArrows(false);
+            // Read appsettings from file
+            ReadConfiguration();
+            
+            if (appConfig != null)
+            {
+                UpdateButtons(false);
+                UpdateArrows(false);
+            }
+            else
+            {
+                Close(); // Close app if config cannot be loaded
+            }
+        }
+
+        private void ShowVersion()
+        {
+            this.Text = $"Excel Editor - {Application.ProductVersion}";
 
             // Altrnatively, include last GitHub commit SHA in version:
             // Remove the following line in project file:
@@ -32,6 +49,41 @@ namespace ExcelEditor
             //string versionStr = Assembly.GetExecutingAssembly()
             //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
             //this.Text = $"Excel Editor - {versionStr}";
+        }
+
+        private void ReadConfiguration()
+        {
+            try
+            {
+                if (!LoadConfig("appsettings.json", out appConfig))
+                {
+                    MessageBox.Show("Configuration file not found. Using default settings.",
+                        "Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading configuration: {ex.Message}",
+                    "Configuration Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private bool LoadConfig(string path, out AppConfig appConfig)
+        {
+            if (!File.Exists(path))
+            {
+                appConfig = new AppConfig();
+                return false; // return default config if file is missing
+            }
+
+            var json = File.ReadAllText(path);
+            appConfig = JsonSerializer.Deserialize<AppConfig>(json);
+
+            return true;
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
