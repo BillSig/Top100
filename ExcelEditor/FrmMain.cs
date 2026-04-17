@@ -231,15 +231,15 @@ namespace ExcelEditor
                 }
                 else
                 {
-                    if (headerRow.LastCellNum < 5)
+                    if (headerRow.LastCellNum < appConfig.ColumnsCounter)
                     {
-                        errorList.Add("The header row must contain at least 5 columns.");
-                    }   
+                        errorList.Add($"The header row must contain at least {appConfig.ColumnsCounter} columns.");
+                    }
                 }
 
-                if (sheet.Count() > 500)
+                if (sheet.Count() > appConfig.MaxGreatestHitsCounter)
                 {
-                    errorList.Add("The selected Excel file contains more than 500 rows.");
+                    errorList.Add($"The selected Excel file contains more than {appConfig.MaxGreatestHitsCounter} rows.");
                 }
             }
 
@@ -275,15 +275,11 @@ namespace ExcelEditor
 
                 UpdateUIRow(e.RowIndex, true);
 
-                //var values = editForm.EditedValues;
-                //foreach (DataColumn col in table.Columns)
-                //{
-                //    table.Rows[e.RowIndex][col.ColumnName] = values[col.ColumnName];
-                //}
-
-
-                // 2) write that row back to Excel
-                //SaveRow(e.RowIndex);
+                // Save Excel file depending on global parameter
+                if (appConfig.SaveToExcelInstantly)
+                {
+                    SaveRow(e.RowIndex);
+                }
             }
         }
 
@@ -329,14 +325,20 @@ namespace ExcelEditor
             var sheet = wb.GetSheetAt(0);
             int hdrRow = sheet.FirstRowNum;
             int sheetRow = hdrRow + 1 + rowIndex;
+
+            // Get row from sheet or create a new one
             var row = sheet.GetRow(sheetRow) ?? sheet.CreateRow(sheetRow);
 
+            // Update cells of the row.
             for (int c = 0; c < table.Columns.Count; c++)
             {
-                //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                // Set the cell of the row with the value of the in-memory cell value.
+                // If the cell doesn't exist, nothing happens.
+                row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
 
-                //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "")
-                //?? row.CreateCell(c).SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                //// If you want to include creation of cells that didn't exist, replace above line of code with the following:
+                //var cell = row.GetCell(c) ?? row.CreateCell(c);
+                //cell.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
             }
 
             // overwrite file
