@@ -273,13 +273,18 @@ namespace ExcelEditor
                 table.Rows[e.RowIndex][3] = currentGreatestHit.VideoLink;
                 table.Rows[e.RowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
 
-                UpdateUIRow(e.RowIndex, true);
+                hasUnsavedChanges = true;
 
                 // Save Excel file depending on global parameter
                 if (appConfig.SaveToExcelInstantly)
                 {
-                    SaveRow(e.RowIndex);
+                    if (SaveRow(e.RowIndex, out var error))
+                    {
+                        hasUnsavedChanges = false;
+                    }
                 }
+
+                UpdateUIRow(e.RowIndex, hasUnsavedChanges);
             }
         }
 
@@ -316,34 +321,48 @@ namespace ExcelEditor
             return currentGreatestHit;
         }
 
-        private void SaveRow(int rowIndex)
+        private bool SaveRow(int rowIndex, out string error)
         {
-            IWorkbook wb;
-            using (var fs = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                wb = WorkbookFactory.Create(fs);
+            bool result = false;
+            error = string.Empty;
 
-            var sheet = wb.GetSheetAt(0);
-            int hdrRow = sheet.FirstRowNum;
-            int sheetRow = hdrRow + 1 + rowIndex;
-
-            // Get row from sheet or create a new one
-            var row = sheet.GetRow(sheetRow) ?? sheet.CreateRow(sheetRow);
-
-            // Update cells of the row.
-            for (int c = 0; c < table.Columns.Count; c++)
+            try
             {
-                // Set the cell of the row with the value of the in-memory cell value.
-                // If the cell doesn't exist, nothing happens.
-                row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                IWorkbook wb;
+                using (var fs = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    wb = WorkbookFactory.Create(fs);
 
-                //// If you want to include creation of cells that didn't exist, replace above line of code with the following:
-                //var cell = row.GetCell(c) ?? row.CreateCell(c);
-                //cell.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                var sheet = wb.GetSheetAt(0);
+                int hdrRow = sheet.FirstRowNum;
+                int sheetRow = hdrRow + 1 + rowIndex;
+
+                // Get row from sheet or create a new one
+                var row = sheet.GetRow(sheetRow) ?? sheet.CreateRow(sheetRow);
+
+                // Update cells of the row.
+                for (int c = 0; c < table.Columns.Count; c++)
+                {
+                    // Set the cell of the row with the value of the in-memory cell value.
+                    // If the cell doesn't exist, nothing happens.
+                    row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+
+                    //// If you want to include creation of cells that didn't exist, replace above line of code with the following:
+                    //var cell = row.GetCell(c) ?? row.CreateCell(c);
+                    //cell.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                }
+
+                // overwrite file
+                using var outFs = new FileStream(excelPath, FileMode.Create, FileAccess.Write);
+                wb.Write(outFs);
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                error = $"File was not saved: {ex.Message}";
             }
 
-            // overwrite file
-            using var outFs = new FileStream(excelPath, FileMode.Create, FileAccess.Write);
-            wb.Write(outFs);
+            return result;
         }
 
         private bool SaveGridToExcel(string path)
