@@ -1,8 +1,10 @@
 using ExcelEditorLibrary.Models;
 using NPOI.SS.UserModel;
+using Serilog;
 using System.Data;
 using System.Reflection;
 using System.Text.Json;
+using System.Web;
 
 namespace ExcelEditor
 {
@@ -57,7 +59,9 @@ namespace ExcelEditor
             {
                 if (!LoadConfig("appsettings.json", out appConfig))
                 {
-                    MessageBox.Show("Configuration file not found. Using default settings.",
+                    string msg = "Configuration file not found. Using default settings.";
+                    Log.Warning(msg);
+                    MessageBox.Show(msg,
                         "Configuration Error",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -65,7 +69,9 @@ namespace ExcelEditor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading configuration: {ex.Message}",
+                string msg = $"Error loading configuration: {ex.Message}";
+                Log.Error(msg);
+                MessageBox.Show(msg,
                     "Configuration Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
@@ -132,7 +138,9 @@ namespace ExcelEditor
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"There was an error while parsing excel file in line {dr[0].ToString()}. Fix the file and reopen! Error: {ex.Message}", "Error", MessageBoxButtons.OK);
+                    string msg = $"There was an error while parsing excel file in line {dr[0].ToString()}. Fix the file and reopen! Error: {ex.Message}";
+                    Log.Error(msg, ex );
+                    MessageBox.Show(msg, "Error", MessageBoxButtons.OK);
                 }
             }
         }
@@ -219,7 +227,9 @@ namespace ExcelEditor
 
             if (sheet == null)
             {
-                errorList.Add("The selected Excel file does not contain any sheets.");
+                string msg = "The selected Excel file does not contain any sheets.";
+                Log.Warning("Operation: {function} {msg}", nameof(ValidateSheet), msg);
+                errorList.Add(msg);
             }
             else
             {
@@ -227,19 +237,25 @@ namespace ExcelEditor
 
                 if (headerRow == null)
                 {
-                    errorList.Add("The selected Excel file does not contain a header row. Please select a valid file.");
+                    string msg = "The selected Excel file does not contain a header row. Please select a valid file.";
+                    Log.Warning("Operation: {function} {msg}", nameof(ValidateSheet), msg);
+                    errorList.Add(msg);
                 }
                 else
                 {
                     if (headerRow.LastCellNum < appConfig.ColumnsCounter)
                     {
-                        errorList.Add($"The header row must contain at least {appConfig.ColumnsCounter} columns.");
+                        string msg = $"The header row must contain at least {appConfig.ColumnsCounter} columns.";
+                        Log.Warning("Operation: {function} {msg}", nameof(ValidateSheet), msg);
+                        errorList.Add(msg);
                     }
                 }
 
                 if (sheet.Count() > appConfig.MaxGreatestHitsCounter)
                 {
-                    errorList.Add($"The selected Excel file contains more than {appConfig.MaxGreatestHitsCounter} rows.");
+                    string msg = $"The selected Excel file contains more than {appConfig.MaxGreatestHitsCounter} rows.";
+                    Log.Warning("Operation: {function} {msg}", nameof(ValidateSheet), msg);
+                    errorList.Add(msg);
                 }
             }
 
@@ -359,7 +375,9 @@ namespace ExcelEditor
             }
             catch (Exception ex)
             {
-                error = $"File was not saved: {ex.Message}";
+                string msg = $"File was not saved: {ex.Message}";
+                Log.Error(msg, ex);
+                error = msg;
             }
 
             return result;
@@ -404,7 +422,9 @@ namespace ExcelEditor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error while sving excel file: {ex.Message}");
+                string msg = $"Error while saving excel file: {ex.Message}";
+                Log.Error(msg, ex );
+                MessageBox.Show(msg);
             }
 
             return result;

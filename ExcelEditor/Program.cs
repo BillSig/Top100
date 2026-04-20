@@ -10,6 +10,7 @@ namespace ExcelEditor
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+            Logger.Configure();
             ApplicationConfiguration.Initialize();
             using (var splash = new FrmSplashScreen())
             {
@@ -18,6 +19,7 @@ namespace ExcelEditor
             }
 
             Application.Run(new FrmMain());
+            Logger.CloseAndFlush();
         }
     }
 }
