@@ -42,15 +42,27 @@ namespace ExcelEditor
 
         private void ShowVersion()
         {
-            this.Text = $"Excel Editor - {Application.ProductVersion}";
+            this.Text = $"Excel Editor - {GetDefaultApplicationVersion()}";
+            //this.Text = $"Excel Editor - {GetApplicationVersionFromGithub()}";
+        }
 
-            // Altrnatively, include last GitHub commit SHA in version:
-            // Remove the following line in project file:
+        private string GetDefaultApplicationVersion()
+        {
+            // Add the following line in project file in version's PropertyGroup:
             // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+            return Application.ProductVersion;
+        }
 
-            //string versionStr = Assembly.GetExecutingAssembly()
-            //    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
-            //this.Text = $"Excel Editor - {versionStr}";
+        private string GetApplicationVersionFromGithub()
+        {
+            // Include last GitHub commit SHA in version:
+
+            // Add the following line in project file in version's PropertyGroup:
+            // <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+
+            string versionStr = Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+            return versionStr;
         }
 
         private void ReadConfiguration()
