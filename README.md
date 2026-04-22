@@ -41,18 +41,19 @@ Technical Specifications
 	Filtering and ordering is a great nice-to-have feature
 	Excel file should not exceed 500 rows.
 	
--	Functionality of v1.0.0
+Functionality of v1.0.0
+-----------------------------
 	o	Update Button: next to Load Excel button. Upon click, the file is saved as is. If no changes exist, it remains disabled.
 	o	Up and Down Arrow buttons: replaces the selected record upwards or downwards respectively. Changes are not automatically saved.
 	o	Discard Button: discards all changes after user’s confirmation.
 	o	Edit Button (Double click a row): A modal form opens with the record data. User may edit all values except Position. OK/Cancel buttons on the modal ensures that the changes are kept in memory. They are not saved however, until user clicks on Update button.
 	o	Show that changes are not saved: Update Button becomes enabled
 	o	Load Button: show warning if there are any unsaved data.
--	Validation
+	Validation
 	o	Excel file should not exceed 500 rows. A warning should be displayed in a modal window when loading the file and before saving it. 
 	o	Saving changes will not be allowed if file exceeds 500 rows.
 
 -	Todo list:
-	o	Ability to create a new row
-	o	Ability to update a row to be placed at an exact position. That would would cause reordering of all the rows
-	o	Ability to save to database instead of excel file
+-		 Ability to create a new row
+-		 Ability to update a row to be placed at an exact position. That would would cause reordering of all the rows
+-		 Ability to save to database instead of excel file

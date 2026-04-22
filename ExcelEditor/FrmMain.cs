@@ -50,6 +50,12 @@ namespace ExcelEditor
         {
             // Add the following line in project file in version's PropertyGroup:
             // <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+            // For release versions, edit the version in project file in version's PropertyGroup:
+            // <InformationalVersion>$(Version)</InformationalVersion>
+
+            // For development versions, edit the version in project file in version's PropertyGroup:
+            // <InformationalVersion>$(Version)-dev-$([System.DateTime]::Now.ToString("yyyyMMdd.HHmmss"))</InformationalVersion>
             return Application.ProductVersion;
         }
 
