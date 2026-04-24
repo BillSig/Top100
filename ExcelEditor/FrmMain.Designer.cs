@@ -31,6 +31,7 @@
             pnlTop = new Panel();
             lblFileName = new Label();
             pnlFilter = new Panel();
+            btnClear = new Button();
             btnFilter = new Button();
             btnMoveUp = new Button();
             btnMoveDown = new Button();
@@ -46,7 +47,6 @@
             pnlMain = new Panel();
             grdMain = new DataGridView();
             openFileDialog1 = new OpenFileDialog();
-            btnClear = new Button();
             pnlTop.SuspendLayout();
             pnlFilter.SuspendLayout();
             pnlMain.SuspendLayout();
@@ -93,15 +93,27 @@
             pnlFilter.Size = new Size(1242, 111);
             pnlFilter.TabIndex = 6;
             // 
+            // btnClear
+            // 
+            btnClear.Anchor = AnchorStyles.Top;
+            btnClear.Location = new Point(498, 42);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(139, 29);
+            btnClear.TabIndex = 12;
+            btnClear.Text = "Clear";
+            btnClear.UseVisualStyleBackColor = true;
+            btnClear.Click += btnClear_Click;
+            // 
             // btnFilter
             // 
-            btnFilter.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnFilter.Anchor = AnchorStyles.Top;
             btnFilter.Location = new Point(498, 7);
             btnFilter.Name = "btnFilter";
             btnFilter.Size = new Size(139, 29);
             btnFilter.TabIndex = 11;
             btnFilter.Text = "Filter";
             btnFilter.UseVisualStyleBackColor = true;
+            btnFilter.Click += btnFilter_Click;
             // 
             // btnMoveUp
             // 
@@ -161,11 +173,14 @@
             // chkIsViewed
             // 
             chkIsViewed.AutoSize = true;
-            chkIsViewed.Location = new Point(22, 79);
+            chkIsViewed.Checked = true;
+            chkIsViewed.CheckState = CheckState.Indeterminate;
+            chkIsViewed.Location = new Point(22, 81);
             chkIsViewed.Name = "chkIsViewed";
             chkIsViewed.Size = new Size(233, 24);
             chkIsViewed.TabIndex = 4;
             chkIsViewed.Text = "Video is viewed / downoladed";
+            chkIsViewed.ThreeState = true;
             chkIsViewed.UseVisualStyleBackColor = true;
             // 
             // txtSong
@@ -238,16 +253,6 @@
             // openFileDialog1
             // 
             openFileDialog1.FileName = "dlgOpenFile";
-            // 
-            // btnClear
-            // 
-            btnClear.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnClear.Location = new Point(498, 42);
-            btnClear.Name = "btnClear";
-            btnClear.Size = new Size(139, 29);
-            btnClear.TabIndex = 12;
-            btnClear.Text = "Clear";
-            btnClear.UseVisualStyleBackColor = true;
             // 
             // FrmMain
             // 

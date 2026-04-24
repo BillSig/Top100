@@ -28,10 +28,10 @@ namespace ExcelEditor
 
             // Read appsettings from file
             ReadConfiguration();
-            
+
             if (appConfig != null)
             {
-                UpdateButtons(false);
+                UpdateButtons(false, true);
                 UpdateArrows(false);
             }
             else
@@ -134,6 +134,7 @@ namespace ExcelEditor
             if (LoadExcelToGrid(excelPath))
             {
                 LoadGreatestHits();
+                UpdateButtons(hasUnsavedChanges, false);
             }
         }
 
@@ -157,7 +158,7 @@ namespace ExcelEditor
                 catch (Exception ex)
                 {
                     string msg = $"There was an error while parsing excel file in line {dr[0].ToString()}. Fix the file and reopen! Error: {ex.Message}";
-                    Log.Error(msg, ex );
+                    Log.Error(msg, ex);
                     MessageBox.Show(msg, "Error", MessageBoxButtons.OK);
                 }
             }
@@ -293,26 +294,44 @@ namespace ExcelEditor
             ///// Get selected row directly from in-memory excel file
             //GreatestHitModel currentGreatestHit = GetSelectedGreatestHit(e.RowIndex);
 
-            // Get selected row from the list
-            GreatestHitModel currentGreatestHit = greatestHits[e.RowIndex];
+            //// Get selected row from the list (no filter)
+            ////GreatestHitModel currentGreatestHit = greatestHits[e.RowIndex];
+            
+            // Get the actual DataRow from either DataTable or DataView
+            DataRow dataRow = GetDataRowFromGrid(e.RowIndex);
+            if (dataRow == null) return;
+
+            // Get position to find the correct item in greatestHits list
+            int position = dataRow[0] == DBNull.Value || string.IsNullOrWhiteSpace(dataRow[0].ToString())
+                ? 0
+                : Convert.ToInt32(dataRow[0]);
+
+            if (position <= 0 || position > greatestHits.Count)
+            {
+                MessageBox.Show("Invalid position value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            GreatestHitModel currentGreatestHit = greatestHits[position - 1];
 
             // show edit form
             using var editForm = new FrmEditRow(currentGreatestHit);
             var result = editForm.ShowDialog();
             if (result == DialogResult.OK)
             {
-                // Update DataTable from currentGreatestHit. It is passed by reference so it is already updated!
-                table.Rows[e.RowIndex][1] = currentGreatestHit.BandName;
-                table.Rows[e.RowIndex][2] = currentGreatestHit.SongTitle;
-                table.Rows[e.RowIndex][3] = currentGreatestHit.VideoLink;
-                table.Rows[e.RowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
+                // Update the underlying DataTable row (not the filtered view index)
+                int tableRowIndex = table.Rows.IndexOf(dataRow);
+                table.Rows[tableRowIndex][1] = currentGreatestHit.BandName;
+                table.Rows[tableRowIndex][2] = currentGreatestHit.SongTitle;
+                table.Rows[tableRowIndex][3] = currentGreatestHit.VideoLink;
+                table.Rows[tableRowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
 
                 hasUnsavedChanges = true;
 
                 // Save Excel file depending on global parameter
                 if (appConfig.SaveToExcelInstantly)
                 {
-                    if (SaveRow(e.RowIndex, out var error))
+                    if (SaveRow(tableRowIndex, out var error))
                     {
                         hasUnsavedChanges = false;
                     }
@@ -322,10 +341,26 @@ namespace ExcelEditor
             }
         }
 
+        private DataRow GetDataRowFromGrid(int gridRowIndex)
+        {
+            if (grdMain.DataSource is DataView dataView)
+            {
+                // When filtered, DataSource is a DataView
+                return dataView[gridRowIndex].Row;
+            }
+            else if (grdMain.DataSource is DataTable dataTable)
+            {
+                // When not filtered, DataSource is a DataTable
+                return dataTable.Rows[gridRowIndex];
+            }
+
+            return null;
+        }
+
         private void UpdateUIRow(int rowIndex, bool recordhasChanged)
         {
             hasUnsavedChanges = recordhasChanged;
-            UpdateButtons(recordhasChanged);
+            UpdateButtons(recordhasChanged, false);
             if (recordhasChanged)
             {
                 grdMain.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
@@ -441,7 +476,7 @@ namespace ExcelEditor
             catch (Exception ex)
             {
                 string msg = $"Error while saving excel file: {ex.Message}";
-                Log.Error(msg, ex );
+                Log.Error(msg, ex);
                 MessageBox.Show(msg);
             }
 
@@ -454,7 +489,7 @@ namespace ExcelEditor
             {
                 MessageBox.Show("Excel file saved successfully!", "Success", MessageBoxButtons.OK);
 
-                UpdateButtons(false);
+                UpdateButtons(false, false);
                 foreach (DataGridViewRow row in grdMain.Rows)
                 {
                     row.DefaultCellStyle.BackColor = Color.White;
@@ -500,15 +535,21 @@ namespace ExcelEditor
             if (result == DialogResult.Yes)
             {
                 LoadExcelToGrid(excelPath);
-                UpdateButtons(false);
+                UpdateButtons(false, false);
             }
         }
 
-        private void UpdateButtons(bool hasChanges)
+        private void UpdateButtons(bool hasChanges, bool isFirstRun)
         {
             hasUnsavedChanges = hasChanges;
             btnSave.Enabled = hasChanges;
             btnDiscard.Enabled = hasChanges;
+
+            txtBand.Enabled = !isFirstRun;
+            txtSong.Enabled = !isFirstRun;
+            chkIsViewed.Enabled = !isFirstRun;
+            btnFilter.Enabled = !isFirstRun;
+            btnClear.Enabled = !isFirstRun;
         }
 
         private void UpdateArrows(bool isRowSelected)
@@ -524,6 +565,13 @@ namespace ExcelEditor
 
         private void btnMoveUp_Click(object sender, EventArgs e)
         {
+            if (IsFiltered())
+            {
+                MessageBox.Show("Cannot move rows while filter is active. Please clear filters first.",
+                    "Filter Active", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (grdMain.CurrentCell == null) return;
             int rowIndex = grdMain.CurrentCell.RowIndex;
 
@@ -542,11 +590,18 @@ namespace ExcelEditor
             grdMain.Rows[rowIndex - 1].Selected = true;
             grdMain.CurrentCell = grdMain.Rows[rowIndex - 1].Cells[0];
 
-            UpdateButtons(true);
+            UpdateButtons(true, false);
         }
 
         private void btnMoveDown_Click(object sender, EventArgs e)
         {
+            if (IsFiltered())
+            {
+                MessageBox.Show("Cannot move rows while filter is active. Please clear filters first.",
+                    "Filter Active", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (grdMain.CurrentRow == null) return;
             int rowIndex = grdMain.CurrentRow.Index;
 
@@ -565,7 +620,7 @@ namespace ExcelEditor
             grdMain.Rows[rowIndex + 1].Selected = true;
             grdMain.CurrentCell = grdMain.Rows[rowIndex + 1].Cells[0];
 
-            UpdateButtons(true);
+            UpdateButtons(true, false);
         }
 
         // Swap all columns except the first (Position)
@@ -596,6 +651,76 @@ namespace ExcelEditor
             greatestHits[indexB].SongTitle = tempSong;
             greatestHits[indexB].VideoLink = tempVideo;
             greatestHits[indexB].IsViewed = tempViewed;
+        }
+
+        private void btnFilter_Click(object sender, EventArgs e)
+        {
+            if (!hasUnsavedChanges)
+            {
+                FilterTable(txtBand.Text, txtSong.Text, chkIsViewed.CheckState);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "You have unsaved changes. Save file first!",
+                    "Unsaved Changes",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            if (!hasUnsavedChanges)
+            {
+                ClearFilters();
+            }
+            else
+            {
+                MessageBox.Show(
+                    "You have unsaved changes. Save file first!",
+                    "Unsaved Changes",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void ClearFilters()
+        {
+            txtBand.Text = string.Empty;
+            txtSong.Text = string.Empty;
+            chkIsViewed.CheckState = CheckState.Indeterminate;
+
+            FilterTable(txtBand.Text, txtSong.Text, chkIsViewed.CheckState);
+        }
+
+        private void FilterTable(string band, string song, CheckState isViewedState)
+        {
+            var filters = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(band))
+                filters.Add($"Band LIKE '%{band.Replace("'", "''")}%'");
+
+            if (!string.IsNullOrWhiteSpace(song))
+                filters.Add($"Song LIKE '%{song.Replace("'", "''")}%'");
+
+            if (isViewedState == CheckState.Checked)
+                filters.Add("[Viewed Data] = 1");
+            else if (isViewedState == CheckState.Unchecked)
+                filters.Add("[Viewed Data] = 0");
+
+            string filterString = string.Join(" AND ", filters);
+
+            DataView view = table.DefaultView;
+            view.RowFilter = filterString;
+
+            grdMain.DataSource = view;
+        }
+
+        private bool IsFiltered()
+        {
+            return grdMain.DataSource is DataView dataView && !string.IsNullOrEmpty(dataView.RowFilter);
         }
     }
 }
