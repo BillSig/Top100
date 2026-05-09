@@ -583,14 +583,29 @@ namespace ExcelEditor
             // Swap in greatestHits except Position
             SwapGreatestHitData(rowIndex, rowIndex - 1);
 
-            UpdateUIRow(rowIndex, true);
-            UpdateUIRow(rowIndex - 1, true);
+            UpdateUIRow(rowIndex, hasUnsavedChanges);
+            UpdateUIRow(rowIndex - 1, hasUnsavedChanges);
 
             grdMain.ClearSelection();
             grdMain.Rows[rowIndex - 1].Selected = true;
             grdMain.CurrentCell = grdMain.Rows[rowIndex - 1].Cells[0];
 
-            UpdateButtons(true, false);
+            // Save Excel file depending on global parameter
+            // rowIndex should be underlying DataTable row (not the filtered view index)
+            if (appConfig.SaveToExcelInstantly)
+            {
+                if (SaveRow(rowIndex, out var error))
+                {
+                    if (SaveRow(rowIndex - 1, out var error2))
+                    {
+                        hasUnsavedChanges = false;
+                        UpdateUIRow(rowIndex, hasUnsavedChanges);
+                        UpdateUIRow(rowIndex - 1, hasUnsavedChanges);
+                    }   
+                }
+            }
+
+            UpdateButtons(hasUnsavedChanges, false);
         }
 
         private void btnMoveDown_Click(object sender, EventArgs e)
@@ -613,14 +628,30 @@ namespace ExcelEditor
             // Swap in greatestHits except Position
             SwapGreatestHitData(rowIndex, rowIndex + 1);
 
-            UpdateUIRow(rowIndex, true);
-            UpdateUIRow(rowIndex + 1, true);
+            hasUnsavedChanges = true;
+            UpdateUIRow(rowIndex, hasUnsavedChanges);
+            UpdateUIRow(rowIndex + 1, hasUnsavedChanges);
 
             grdMain.ClearSelection();
             grdMain.Rows[rowIndex + 1].Selected = true;
             grdMain.CurrentCell = grdMain.Rows[rowIndex + 1].Cells[0];
 
-            UpdateButtons(true, false);
+            // Save Excel file depending on global parameter
+            // rowIndex should be underlying DataTable row (not the filtered view index)
+            if (appConfig.SaveToExcelInstantly)
+            {
+                if (SaveRow(rowIndex, out var error))
+                {
+                    if (SaveRow(rowIndex + 1, out var error2))
+                    {
+                        hasUnsavedChanges = false;
+                        UpdateUIRow(rowIndex, hasUnsavedChanges);
+                        UpdateUIRow(rowIndex + 1, hasUnsavedChanges);
+                    }   
+                }
+            }
+
+            UpdateButtons(hasUnsavedChanges, false);
         }
 
         // Swap all columns except the first (Position)
