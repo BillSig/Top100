@@ -296,7 +296,7 @@ namespace ExcelEditor
 
             //// Get selected row from the list (no filter)
             ////GreatestHitModel currentGreatestHit = greatestHits[e.RowIndex];
-            
+
             // Get the actual DataRow from either DataTable or DataView
             DataRow dataRow = GetDataRowFromGrid(e.RowIndex);
             if (dataRow == null) return;
@@ -550,6 +550,8 @@ namespace ExcelEditor
             chkIsViewed.Enabled = !isFirstRun;
             btnFilter.Enabled = !isFirstRun;
             btnClear.Enabled = !isFirstRun;
+            btnAdd.Enabled = !isFirstRun;
+            btnDelete.Enabled = !isFirstRun;
         }
 
         private void UpdateArrows(bool isRowSelected)
@@ -560,7 +562,11 @@ namespace ExcelEditor
 
         private void grdMain_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            UpdateArrows(e.RowIndex >= 0);
+            bool isRowSelected = e.RowIndex >= 0;
+            UpdateArrows(isRowSelected);
+
+            // Also enable/disable Delete button based on selection
+            btnDelete.Enabled = isRowSelected && !string.IsNullOrEmpty(excelPath);
         }
 
         private void btnMoveUp_Click(object sender, EventArgs e)
@@ -601,7 +607,7 @@ namespace ExcelEditor
                         hasUnsavedChanges = false;
                         UpdateUIRow(rowIndex, hasUnsavedChanges);
                         UpdateUIRow(rowIndex - 1, hasUnsavedChanges);
-                    }   
+                    }
                 }
             }
 
@@ -647,7 +653,7 @@ namespace ExcelEditor
                         hasUnsavedChanges = false;
                         UpdateUIRow(rowIndex, hasUnsavedChanges);
                         UpdateUIRow(rowIndex + 1, hasUnsavedChanges);
-                    }   
+                    }
                 }
             }
 
@@ -698,7 +704,7 @@ namespace ExcelEditor
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
-            
+
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -752,6 +758,248 @@ namespace ExcelEditor
         private bool IsFiltered()
         {
             return grdMain.DataSource is DataView dataView && !string.IsNullOrEmpty(dataView.RowFilter);
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            if (IsFiltered())
+            {
+                MessageBox.Show("Cannot add rows while filter is active. Please clear filters first.", "Filter Active", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(excelPath) || table == null || table.Rows.Count == 0)
+            {
+                MessageBox.Show("Please open an Excel file first.", "No File Open", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Get the insertion position from selected row
+            int insertPosition;
+            if (grdMain.CurrentRow != null && grdMain.CurrentRow.Index >= 0)
+            {
+                DataRow selectedRow = GetDataRowFromGrid(grdMain.CurrentRow.Index);
+                if (selectedRow == null) return;
+
+                insertPosition = selectedRow[0] == DBNull.Value || string.IsNullOrWhiteSpace(selectedRow[0].ToString())
+                    ? 0
+                    : Convert.ToInt32(selectedRow[0]);
+            }
+            else
+            {
+                // If no row selected, add at the end
+                insertPosition = greatestHits.Count + 1;
+            }
+
+            if (insertPosition <= 0)
+            {
+                MessageBox.Show("Invalid position value.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Check if we're at max capacity
+            if (table.Rows.Count >= appConfig.MaxGreatestHitsCounter)
+            {
+                MessageBox.Show($"Cannot add more rows. Maximum of {appConfig.MaxGreatestHitsCounter} rows allowed.",
+                    "Maximum Rows Reached", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Create new empty GreatestHitModel at the insertion position
+            var newHit = new GreatestHitModel
+            {
+                Position = insertPosition,
+                BandName = string.Empty,
+                SongTitle = string.Empty,
+                VideoLink = string.Empty,
+                IsViewed = false
+            };
+
+            // Show edit form for the new row
+            using var editForm = new FrmEditRow(newHit);
+            var result = editForm.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                // Insert into greatestHits list at position (list is 0-based)
+                greatestHits.Insert(insertPosition - 1, newHit);
+
+                // Renumber all subsequent positions in greatestHits
+                for (int i = insertPosition; i < greatestHits.Count; i++)
+                {
+                    greatestHits[i].Position = i + 1;
+                }
+
+                // Create and insert new DataRow at the correct position
+                var newDataRow = table.NewRow();
+                newDataRow[0] = newHit.Position;
+                newDataRow[1] = newHit.BandName;
+                newDataRow[2] = newHit.SongTitle;
+                newDataRow[3] = newHit.VideoLink;
+                newDataRow[4] = newHit.IsViewed ? 1 : 0;
+
+                table.Rows.InsertAt(newDataRow, insertPosition - 1);
+
+                // Update positions in DataTable for all subsequent rows
+                for (int i = insertPosition; i < table.Rows.Count; i++)
+                {
+                    table.Rows[i][0] = i + 1;
+                }
+
+                hasUnsavedChanges = true;
+
+                // Refresh the grid to reflect changes
+                grdMain.Refresh();
+
+                // Save Excel file depending on global parameter
+                if (appConfig.SaveToExcelInstantly)
+                {
+                    if (SaveGridToExcel(excelPath))
+                    {
+                        hasUnsavedChanges = false;
+                        MessageBox.Show("New row added and saved successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Row added but save failed. Please save manually.", "Warning",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"New row inserted at position {insertPosition}. Don't forget to save!",
+                        "Row Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                UpdateButtons(hasUnsavedChanges, false);
+
+                // Highlight and select the newly inserted row
+                if (insertPosition - 1 < grdMain.Rows.Count)
+                {
+                    grdMain.ClearSelection();
+                    grdMain.Rows[insertPosition - 1].Selected = true;
+                    grdMain.CurrentCell = grdMain.Rows[insertPosition - 1].Cells[0];
+                    grdMain.FirstDisplayedScrollingRowIndex = Math.Max(0, insertPosition - 2);
+                    UpdateUIRow(insertPosition - 1, hasUnsavedChanges);
+                }
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (IsFiltered())
+            {
+                MessageBox.Show("Cannot delete rows while filter is active. Please clear filters first.",
+                    "Filter Active", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(excelPath) || table == null || table.Rows.Count == 0)
+            {
+                MessageBox.Show("Please open an Excel file first.", "No File Open",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (grdMain.CurrentRow == null || grdMain.CurrentRow.Index < 0)
+            {
+                MessageBox.Show("Please select a row to delete.", "No Selection",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int gridRowIndex = grdMain.CurrentRow.Index;
+
+            // Get the DataRow to find position
+            DataRow dataRow = GetDataRowFromGrid(gridRowIndex);
+            if (dataRow == null) return;
+
+            int position = dataRow[0] == DBNull.Value || string.IsNullOrWhiteSpace(dataRow[0].ToString())
+                ? 0
+                : Convert.ToInt32(dataRow[0]);
+
+            if (position <= 0 || position > greatestHits.Count)
+            {
+                MessageBox.Show("Invalid position value.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Confirm deletion with row details
+            var confirmResult = MessageBox.Show(
+                $"Are you sure you want to delete row {position}?\n\n" +
+                $"Band: {dataRow[1]}\n" +
+                $"Song: {dataRow[2]}\n\n" +
+                $"This action will renumber all rows below position {position}.",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (confirmResult == DialogResult.Yes)
+            {
+                // Remove from greatestHits list (0-based index)
+                greatestHits.RemoveAt(position - 1);
+
+                // Renumber all subsequent positions in greatestHits
+                for (int i = position - 1; i < greatestHits.Count; i++)
+                {
+                    greatestHits[i].Position = i + 1;
+                }
+
+                // Get the actual DataTable row index
+                int tableRowIndex = table.Rows.IndexOf(dataRow);
+
+                // Remove from DataTable
+                table.Rows.RemoveAt(tableRowIndex);
+
+                // Update positions in DataTable for all subsequent rows
+                for (int i = tableRowIndex; i < table.Rows.Count; i++)
+                {
+                    table.Rows[i][0] = i + 1;
+                }
+
+                hasUnsavedChanges = true;
+
+                // Refresh the grid to reflect changes
+                grdMain.Refresh();
+
+                // Save Excel file depending on global parameter
+                if (appConfig.SaveToExcelInstantly)
+                {
+                    if (SaveGridToExcel(excelPath))
+                    {
+                        hasUnsavedChanges = false;
+                        MessageBox.Show($"Row {position} deleted and file saved successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Row deleted but save failed. Please save manually.", "Warning",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"Row {position} deleted. Don't forget to save!",
+                        "Row Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                UpdateButtons(hasUnsavedChanges, false);
+
+                // Select the row that now occupies the deleted row's position (if exists)
+                if (table.Rows.Count > 0)
+                {
+                    grdMain.ClearSelection();
+                    int newSelectedIndex = Math.Min(gridRowIndex, grdMain.Rows.Count - 1);
+                    if (newSelectedIndex >= 0)
+                    {
+                        grdMain.Rows[newSelectedIndex].Selected = true;
+                        grdMain.CurrentCell = grdMain.Rows[newSelectedIndex].Cells[0];
+                    }
+                }
+            }
         }
     }
 }

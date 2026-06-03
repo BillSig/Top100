@@ -31,6 +31,8 @@
             pnlTop = new Panel();
             lblFileName = new Label();
             pnlFilter = new Panel();
+            btnDelete = new Button();
+            btnAdd = new Button();
             btnClear = new Button();
             btnFilter = new Button();
             btnMoveUp = new Button();
@@ -75,6 +77,8 @@
             // 
             // pnlFilter
             // 
+            pnlFilter.Controls.Add(btnDelete);
+            pnlFilter.Controls.Add(btnAdd);
             pnlFilter.Controls.Add(btnClear);
             pnlFilter.Controls.Add(btnFilter);
             pnlFilter.Controls.Add(btnMoveUp);
@@ -92,6 +96,28 @@
             pnlFilter.Name = "pnlFilter";
             pnlFilter.Size = new Size(1242, 111);
             pnlFilter.TabIndex = 6;
+            // 
+            // btnDelete
+            // 
+            btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnDelete.Location = new Point(1161, 42);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(69, 29);
+            btnDelete.TabIndex = 14;
+            btnDelete.Text = "-";
+            btnDelete.UseVisualStyleBackColor = true;
+            btnDelete.Click += btnDelete_Click;
+            // 
+            // btnAdd
+            // 
+            btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAdd.Location = new Point(1091, 42);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(69, 29);
+            btnAdd.TabIndex = 13;
+            btnAdd.Text = "+";
+            btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
             // 
             // btnClear
             // 
@@ -298,5 +324,7 @@
         private Label lblFileName;
         private Button btnFilter;
         private Button btnClear;
+        private Button btnDelete;
+        private Button btnAdd;
     }
 }
