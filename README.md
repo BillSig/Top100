@@ -1,59 +1,206 @@
-# Top100
-A .NET form application to edit an excel file that will be used to have My Greatest Hits Songs of my life
+# Excel Editor - Top 100 Greatest Hits Manager
 
-The application will only have a main form with a Open File component in order to load a single excel file. 
-Upon selecting the Excel file, the contents of its 1st sheet will be displayed in a grid. 
-Row click will be enabled. 
-The functionality of the grid will be the following: 
+A WinForms application for managing and editing an Excel file containing your personal "Greatest Hits" song collection. This tool provides an intuitive interface for CRUD operations, row reordering, and filtering capabilities.
 
-1) Ability to edit a row: 
-	The user would double-click a row and a pop up form would appear with the values of each cell. 
-	The user would be able to edit the values of the cell and click Update or Discard buttons to update the excel row or discard any changes respectively. 
-2) Ability to reorder rows: 
-	The user would select a row and then use Up and Down buttons in order to move the row up or down in the grid. 
-	Update and Discard buttons would update the excel file or discard any changes.
-	
-Technical Specifications
------------------------------
-	
-1. UI Framework and .NET Version
-	WinForms
-	Target framework: .NET 8
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-2. Excel Library
-	Simple excel read/write
-	Work only with plain cell values. We might add features in the future that could be translated to Excel formulas.
+## 📋 Overview
 
-3. Header Row & Data Types
-	The first row in the sheet contains column headers that will be displayed as grid column names
-	All columns are text/string
-	
-4. Editing Workflow
-	Updating a row would commit immediately all changes to file depending on a global parameter.
-	Discard should revert the changes of the selected row.
+Excel Editor is a desktop application designed to manage a curated list of favorite songs stored in an Excel file. It provides a user-friendly grid interface with full CRUD functionality, row reordering, and advanced filtering options.
 
-5. Reordering Workflow
-	Moving a row Up and Down stages the reorder-in-grid and only after clicking on grid's Update button will the changes become permanent.
-	Discard should undo all changes.
+## ✨ Features
 
-6. Additional Features
-	All CRUD functionality would be available.
-	Filtering and ordering is a great nice-to-have feature
-	Excel file should not exceed 500 rows.
-	
-Functionality of v1.0.0
------------------------------
-	o	Update Button: next to Load Excel button. Upon click, the file is saved as is. If no changes exist, it remains disabled.
-	o	Up and Down Arrow buttons: replaces the selected record upwards or downwards respectively. Changes are not automatically saved.
-	o	Discard Button: discards all changes after user’s confirmation.
-	o	Edit Button (Double click a row): A modal form opens with the record data. User may edit all values except Position. OK/Cancel buttons on the modal ensures that the changes are kept in memory. They are not saved however, until user clicks on Update button.
-	o	Show that changes are not saved: Update Button becomes enabled
-	o	Load Button: show warning if there are any unsaved data.
-	Validation
-	o	Excel file should not exceed 500 rows. A warning should be displayed in a modal window when loading the file and before saving it. 
-	o	Saving changes will not be allowed if file exceeds 500 rows.
+### Current Version (v1.1)
+- ✅ **Full CRUD Operations**: Create, Read, Update, and Delete records
+- ✅ **Row Reordering**: Move songs up/down with visual feedback
+- ✅ **Advanced Filtering**: Filter by band name, song title, and viewed status
+- ✅ **Instant or Manual Save**: Configurable save behavior via `appsettings.json`
+- ✅ **Unsaved Changes Tracking**: Visual indicators (yellow highlight) for modified rows
+- ✅ **Data Validation**: 500-row limit enforcement with user warnings
+- ✅ **Excel Format Support**: Compatible with `.xls` and `.xlsx` files
+- ✅ **Logging**: Integrated Serilog for debugging and error tracking
+- ✅ **Splash Screen**: Professional startup experience
 
--	Todo list:
--		 Ability to create a new row
--		 Ability to update a row to be placed at an exact position. That would would cause reordering of all the rows
--		 Ability to save to database instead of excel file
+### Data Model
+Each record contains:
+- **Position** (Integer): Row number/ranking
+- **Band Name** (String): Artist or band name
+- **Song Title** (String): Song name
+- **Video Link** (String): URL to video (e.g., YouTube)
+- **Viewed Data** (Boolean): Generic Flag indicating if the video has been watched / downloaded / archived or listed for further action
+
+## 🚀 Getting Started
+
+### Prerequisites
+- .NET 8.0 Runtime or SDK
+- Windows OS (WinForms application)
+- Excel file with the following structure:
+  - First row: Header with column names
+  - Columns: Position | Band | Song | Video Link | Viewed Data
+  - Maximum 500 rows (excluding header)
+
+### Installation and Deployment
+
+1. **Clone the repository**
+
+2. **Build the solution**
+
+3. **Run the application**
+
+### Configuration
+
+Edit `appsettings.json` to customize application behavior:
+
+**Configuration Options:**
+- `MaxGreatestHitsCounter`: Maximum allowed rows (default: 500)
+- `ColumnsCounter`: Expected number of columns (default: 5)
+- `SaveToExcelInstantly`: 
+  - `true`: Auto-save after each operation
+  - `false`: Manual save required (Update button)
+
+## 📖 Usage
+
+### Loading an Excel File
+1. Click **Load Excel** button
+2. Select your `.xlsx` or `.xls` file
+3. The grid will display all records from the first sheet
+
+### Editing a Record
+1. **Double-click** any row to open the edit dialog
+2. Modify fields (Position is read-only)
+3. Click **OK** to stage changes or **Cancel** to discard
+4. Modified rows appear with **yellow background**
+5. Click **Update** to save or **Discard** to revert
+
+### Adding a New Record
+1. Select a row (new record will insert at this position)
+2. Click **Add** button
+3. Fill in the details in the dialog
+4. Click **OK** to insert the record
+5. All subsequent rows will be automatically renumbered
+
+### Deleting a Record
+1. Select the row to delete
+2. Click **Delete** button
+3. Confirm the deletion
+4. All subsequent rows will be automatically renumbered
+
+### Reordering Records
+1. Select a row
+2. Use **Up** ↑ or **Down** ↓ arrow buttons
+3. Rows swap positions (Position column remains sequential)
+4. Click **Update** to save changes
+
+### Filtering Records
+1. Enter search terms in:
+   - **Band** textbox (partial match)
+   - **Song** textbox (partial match)
+   - **Viewed** checkbox (Checked/Unchecked/Indeterminate)
+2. Click **Filter** to apply
+3. Click **Clear** to reset filters
+
+> **Note:** Editing, reordering, adding, and deleting are disabled while filters are active. Clear filters first.
+
+### Key Features Implementation
+
+#### Change Tracking
+- In-memory `DataTable` for grid operations
+- `List<GreatestHitModel>` for business logic
+- Visual feedback with yellow row highlighting
+- Enable/disable Update button based on state
+
+#### Excel Operations
+- Read: Load entire first sheet into `DataTable`
+- Write: Overwrite Excel file with current `DataTable` state
+- Validation: Row count, header presence, column count
+- Format Support: Auto-detection of `.xls` vs `.xlsx`
+
+#### Data Integrity
+- Position column auto-renumbering on insert/delete
+- Row swapping maintains sequential positions
+- Filter state prevents conflicting operations
+- Unsaved changes prompt on file load and application exit
+
+## 📚 Version History
+
+### v1.1.0 (Current)
+**Major Feature Addition: Full CRUD Support**
+- ➕ **Add Record**: Insert new records at any position with automatic renumbering
+- 🗑️ **Delete Record**: Remove records with confirmation and automatic renumbering
+- 🔍 **Advanced Filtering**: Multi-criteria filtering by band, song, and viewed status
+- 🎨 **UX Improvements**: Visual feedback for unsaved changes (yellow highlight)
+- ⚙️ **Configurable Auto-Save**: Toggle instant save vs. manual save mode
+- 🔒 **Filter Safety**: Prevent editing operations while filters are active
+- 📝 **Logging Integration**: Comprehensive Serilog implementation
+
+**Breaking Changes:**
+- Configuration now required in `appsettings.json`
+- `SaveToExcelInstantly` parameter added
+
+### v1.0.0 (Initial Release)
+**Core Functionality**
+- 📂 **Load Excel File**: Open `.xlsx` and `.xls` files
+- ✏️ **Edit Records**: Double-click to edit, with OK/Cancel dialog
+- 🔄 **Reorder Rows**: Move records up/down with arrow buttons
+- 💾 **Manual Save**: Update button to commit all changes
+- ❌ **Discard Changes**: Revert all unsaved modifications
+- ⚠️ **Validation**: 500-row limit enforcement
+- 🔔 **Unsaved Changes Warning**: Alerts on file load and app exit
+
+**Technical Stack (v1.0.0):**
+- WinForms on .NET 8
+- NPOI for Excel operations
+- Manual save workflow
+- Basic grid display with row selection
+
+**Limitations (v1.0.0):**
+- No add/delete functionality
+- No filtering or search capabilities
+- Manual save only (no auto-save option)
+- Limited validation and error handling
+
+## 🔮 Roadmap
+
+### Planned Features
+- [ ] **Precise Row Insertion**: Insert at exact position with UI input
+- [ ] **Database Backend**: Option to save data to SQL database instead of Excel
+- [ ] **Export Options**: Export to CSV, JSON formats
+- [ ] **Sorting**: Column-based sorting in grid
+- [ ] **Undo/Redo**: Operation history management
+- [ ] **Bulk Operations**: Multi-row selection and batch editing
+- [ ] **Import from URL**: Auto-fetch video metadata from URLs
+- [ ] **Dark Mode**: Theme support
+
+### Known Issues
+- Filters must be cleared before CRUD operations
+- Large files (>500 rows) are rejected entirely (no partial load)
+- Position column not editable (by design)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [NPOI](https://github.com/nissl-lab/npoi) - .NET Excel library
+- [Serilog](https://serilog.net/) - Logging framework
+- README file developed with assistance from ChatGPT
+
+## 📧 Contact
+
+**Project Maintainer**: BillSig  
+**Repository**: [https://github.com/BillSig/Top100](https://github.com/BillSig/Top100)
+
+---
+
+**Note**: This application is designed for personal use to manage a curated music collection. Excel file location references and video storage paths are configured for local development environments.
