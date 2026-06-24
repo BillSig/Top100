@@ -68,3 +68,11 @@ TODO List:
 -	Validation
 	o	Excel file should not exceed 500 rows. A warning should be displayed in a modal window when loading the file and before saving it. 
 	o	Saving changes will not be allowed if file exceeds 500 rows.
+
+Version 2.
+------------------
+Definition of columns need to be abstract, not hard-coded
+GreatestHit class should inherit Row class
+A row's index can be specifically set. i.e: If row with index 5 is set to become 10, then 6 goes to 5, 7->6, 8->7, 9->8, 10->9
+Top100 should become a class library, the same goes for Excel CRUD. MainForms should become abstract
+Ability to save to database
