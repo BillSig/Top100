@@ -14,10 +14,22 @@ namespace ExcelEditor
     public partial class FrmEditRow : Form
     {
         GreatestHitModel _CurrentGreatestHit;
-        public FrmEditRow(GreatestHitModel currentGreatestHit)
+        bool _UpdatePosition;
+        public FrmEditRow(GreatestHitModel currentGreatestHit, bool updatePosition, int maxPosition)
         {
             InitializeComponent();
+
             _CurrentGreatestHit = currentGreatestHit;
+            _UpdatePosition = updatePosition;
+
+            nudPosition.Minimum = 1;
+            nudPosition.Maximum = maxPosition;
+
+            if (!_UpdatePosition)
+            {
+                nudPosition.Enabled = false;
+            }
+
             if (currentGreatestHit != null) 
             {
                 ShowCurrentGreatestHit();
@@ -27,6 +39,7 @@ namespace ExcelEditor
         private void ShowCurrentGreatestHit()
         {
             txtPosition.Text = _CurrentGreatestHit.Position.ToString();
+            nudPosition.Value = _CurrentGreatestHit.Position;
             txtBandName.Text = _CurrentGreatestHit.BandName;
             txtSongTitle.Text = _CurrentGreatestHit.SongTitle;
             txtVideoLink.Text = _CurrentGreatestHit.VideoLink;
@@ -42,6 +55,11 @@ namespace ExcelEditor
 
         private void UpdateCurrentGreatestHit()
         {
+            if (_UpdatePosition)
+            {
+                _CurrentGreatestHit.Position = (int)nudPosition.Value;
+            }
+
             _CurrentGreatestHit.BandName = txtBandName.Text;
             _CurrentGreatestHit.SongTitle = txtSongTitle.Text;
             _CurrentGreatestHit.VideoLink = txtVideoLink.Text;
