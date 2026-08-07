@@ -163,7 +163,7 @@ Edit `appsettings.json` to customize application behavior:
 ## 🔮 Roadmap
 
 ### Planned Features
-- [ ] **Precise Row Insertion**: Insert at exact position with UI input
+- [ ] **Precise Row Upsertion**: Insert or update at exact position with UI input
 - [ ] **Database Backend**: Option to save data to SQL database instead of Excel
 - [ ] **Export Options**: Export to CSV, JSON formats
 - [ ] **Sorting**: Column-based sorting in grid
@@ -175,7 +175,7 @@ Edit `appsettings.json` to customize application behavior:
 ### Known Issues
 - Filters must be cleared before CRUD operations
 - Large files (>500 rows) are rejected entirely (no partial load)
-- Position column not editable (by design)
+- Position column not editable (by design). A refactor is needed in order to implement a Precise Row Upsertion
 
 ## 🤝 Contributing
 
