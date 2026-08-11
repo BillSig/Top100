@@ -11,5 +11,6 @@ namespace ExcelEditor
         public int MaxGreatestHitsCounter { get; set; } = 500;
         public int ColumnsCounter { get; set; } = 5;
         public bool SaveToExcelInstantly { get; set; }
+        public bool UpdatePosition { get; set; }
     }
 }

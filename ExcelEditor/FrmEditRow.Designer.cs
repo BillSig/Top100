@@ -39,6 +39,8 @@
             chkIsViewed = new CheckBox();
             btnOK = new Button();
             btnCancel = new Button();
+            nudPosition = new NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)nudPosition).BeginInit();
             SuspendLayout();
             // 
             // lblPosition
@@ -54,11 +56,12 @@
             // 
             txtPosition.AcceptsTab = true;
             txtPosition.Enabled = false;
-            txtPosition.Location = new Point(89, 12);
+            txtPosition.Location = new Point(87, 50);
             txtPosition.Name = "txtPosition";
-            txtPosition.Size = new Size(54, 27);
+            txtPosition.Size = new Size(51, 27);
             txtPosition.TabIndex = 1;
             txtPosition.TextAlign = HorizontalAlignment.Right;
+            txtPosition.Visible = false;
             // 
             // txtBandName
             // 
@@ -141,12 +144,20 @@
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
             // 
+            // nudPosition
+            // 
+            nudPosition.Location = new Point(87, 10);
+            nudPosition.Name = "nudPosition";
+            nudPosition.Size = new Size(51, 27);
+            nudPosition.TabIndex = 11;
+            // 
             // FrmEditRow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(695, 181);
             ControlBox = false;
+            Controls.Add(nudPosition);
             Controls.Add(btnCancel);
             Controls.Add(btnOK);
             Controls.Add(chkIsViewed);
@@ -162,6 +173,7 @@
             MaximizeBox = false;
             Name = "FrmEditRow";
             Text = "FrmEditRow";
+            ((System.ComponentModel.ISupportInitialize)nudPosition).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -179,5 +191,6 @@
         private CheckBox chkIsViewed;
         private Button btnOK;
         private Button btnCancel;
+        private NumericUpDown nudPosition;
     }
 }

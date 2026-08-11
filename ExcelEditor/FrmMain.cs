@@ -302,29 +302,44 @@ namespace ExcelEditor
             if (dataRow == null) return;
 
             // Get position to find the correct item in greatestHits list
-            int position = dataRow[0] == DBNull.Value || string.IsNullOrWhiteSpace(dataRow[0].ToString())
+            // It is named oldPosition because it may be changed by the user
+            int oldPosition = dataRow[0] == DBNull.Value || string.IsNullOrWhiteSpace(dataRow[0].ToString())
                 ? 0
                 : Convert.ToInt32(dataRow[0]);
 
-            if (position <= 0 || position > greatestHits.Count)
+            if (oldPosition <= 0 || oldPosition > greatestHits.Count)
             {
                 MessageBox.Show("Invalid position value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            GreatestHitModel currentGreatestHit = greatestHits[position - 1];
+            GreatestHitModel currentGreatestHit = greatestHits[oldPosition - 1];
 
             // show edit form
-            using var editForm = new FrmEditRow(currentGreatestHit);
+            using var editForm = new FrmEditRow(currentGreatestHit, appConfig.UpdatePosition, greatestHits.Count);
             var result = editForm.ShowDialog();
             if (result == DialogResult.OK)
             {
+                int newPosition = currentGreatestHit.Position;
+                bool positionChanged = appConfig.UpdatePosition && newPosition != oldPosition;
+
                 // Update the underlying DataTable row (not the filtered view index)
                 int tableRowIndex = table.Rows.IndexOf(dataRow);
+                table.Rows[tableRowIndex][0] = currentGreatestHit.Position;
                 table.Rows[tableRowIndex][1] = currentGreatestHit.BandName;
                 table.Rows[tableRowIndex][2] = currentGreatestHit.SongTitle;
                 table.Rows[tableRowIndex][3] = currentGreatestHit.VideoLink;
                 table.Rows[tableRowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
+
+                if (positionChanged)
+                {
+                    MoveGreatestHit(oldPosition, newPosition);
+                    RebuildTableFromGreatestHits();
+                }
+                else
+                {
+                    UpdateTableRowFromGreatestHit(oldPosition - 1, currentGreatestHit);
+                }
 
                 hasUnsavedChanges = true;
 
@@ -337,7 +352,72 @@ namespace ExcelEditor
                     }
                 }
 
-                UpdateUIRow(e.RowIndex, hasUnsavedChanges);
+                //UpdateUIRow(e.RowIndex, hasUnsavedChanges);
+
+                UpdateButtons(hasUnsavedChanges, false);
+                MarkChangedRange(Math.Min(oldPosition, newPosition) - 1, Math.Max(oldPosition, newPosition) - 1, hasUnsavedChanges);
+                grdMain.Refresh();
+            }
+        }
+
+        private void MoveGreatestHit(int oldPosition, int newPosition)
+        {
+            if (oldPosition == newPosition) return;
+
+            var moved = greatestHits[oldPosition - 1];
+            greatestHits.RemoveAt(oldPosition - 1);
+            greatestHits.Insert(newPosition - 1, moved);
+
+            if (oldPosition < newPosition)
+            {
+                for (int i = oldPosition; i < newPosition; i++)
+                {
+                    greatestHits[i - 1].Position = i;
+                }
+            }
+            else
+            {
+                for (int i = oldPosition; i > newPosition; i--)
+                {
+                    greatestHits[i - 1].Position = i;
+                }
+            }
+            
+        }
+
+        private void RebuildTableFromGreatestHits()
+        {
+            table.Rows.Clear();
+
+            foreach (var hit in greatestHits)
+            {
+                var row = table.NewRow();
+                row[0] = hit.Position;
+                row[1] = hit.BandName;
+                row[2] = hit.SongTitle;
+                row[3] = hit.VideoLink;
+                row[4] = hit.IsViewed ? 1 : 0;
+                table.Rows.Add(row);
+            }
+        }
+
+        private void UpdateTableRowFromGreatestHit(int tableRowIndex, GreatestHitModel hit)
+        {
+            table.Rows[tableRowIndex][0] = hit.Position;
+            table.Rows[tableRowIndex][1] = hit.BandName;
+            table.Rows[tableRowIndex][2] = hit.SongTitle;
+            table.Rows[tableRowIndex][3] = hit.VideoLink;
+            table.Rows[tableRowIndex][4] = hit.IsViewed ? 1 : 0;
+        }
+
+        private void MarkChangedRange(int startRowIndex, int endRowIndex, bool changed)
+        {
+            int start = Math.Max(0, startRowIndex);
+            int end = Math.Min(grdMain.Rows.Count - 1, endRowIndex);
+
+            for (int i = start; i <= end; i++)
+            {
+                grdMain.Rows[i].DefaultCellStyle.BackColor = changed ? Color.LightYellow : Color.White;
             }
         }
 
@@ -817,7 +897,7 @@ namespace ExcelEditor
             };
 
             // Show edit form for the new row
-            using var editForm = new FrmEditRow(newHit);
+            using var editForm = new FrmEditRow(newHit, appConfig.UpdatePosition, greatestHits.Count + 1);
             var result = editForm.ShowDialog();
 
             if (result == DialogResult.OK)
