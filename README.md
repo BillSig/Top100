@@ -124,6 +124,9 @@ Edit `appsettings.json` to customize application behavior:
 
 ## 📚 Version History
 
+### v1.2.0 (Current)
+**User can update row position of a track**: Editing the row of a row causes affected rows to be updated as well
+
 ### v1.1.0 (Current)
 **Major Feature Addition: Full CRUD Support**
 - ➕ **Add Record**: Insert new records at any position with automatic renumbering
@@ -175,7 +178,6 @@ Edit `appsettings.json` to customize application behavior:
 ### Known Issues
 - Filters must be cleared before CRUD operations
 - Large files (>500 rows) are rejected entirely (no partial load)
-- Position column not editable (by design). A refactor is needed in order to implement a Precise Row Upsertion
 
 ## 🤝 Contributing
 
