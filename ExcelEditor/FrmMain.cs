@@ -184,13 +184,57 @@ namespace ExcelEditor
 
             // Header row
             var headerRow = sheet.GetRow(sheet.FirstRowNum);
-            for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum && !headerRow.GetCell(c).StringCellValue.Contains("Column"); c++)
+            if (headerRow == null)
             {
+                MessageBox.Show("Header row not found.", "Invalid Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Map source Excel column indexes -> DataTable column indexes
+            var sourceColumnIndexes = new List<int>();
+
+            for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum; c++)
+            {
+                var headerCell = headerRow.GetCell(c, MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                var headerText = headerCell?.ToString()?.Trim();
+                if (string.IsNullOrWhiteSpace(headerText))
+                {
+                    continue;
+                }
+
+                // Stop when helper/generated "Column..." headers begin
+                if (headerText.Contains("Column", StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+
                 // Set the first column ("Position") as int, others as string
-                if (c == 0)
-                    dt.Columns.Add(headerRow.GetCell(c).ToString(), typeof(int));
+                if (dt.Columns.Count == 0)
+                {
+                    dt.Columns.Add(headerText, typeof(int)); // Position
+                }
                 else
-                    dt.Columns.Add(headerRow.GetCell(c).ToString(), typeof(string));
+                {
+                    dt.Columns.Add(headerText, typeof(string));
+                }
+
+                sourceColumnIndexes.Add(c);
+
+                // TODO: hard-limit to configured expected columns
+                //if (dt.Columns.Count >= appConfig.ColumnsCounter)
+                //{
+                //    break;
+                //}
+            }
+
+            if (dt.Columns.Count < appConfig.ColumnsCounter)
+            {
+                MessageBox.Show(
+                    $"The header row must contain at least {appConfig.ColumnsCounter} usable columns.",
+                    "Invalid Format",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
             }
 
             // Data rows
@@ -204,28 +248,37 @@ namespace ExcelEditor
 
                 bool isEmpty = true;
                 var dr = dt.NewRow();
-                for (int c = headerRow.FirstCellNum; c < headerRow.LastCellNum; c++)
+
+                for (int i = 0; i < sourceColumnIndexes.Count; i++)
                 {
-                    var cell = row.GetCell(c);
+                    int sourceCol = sourceColumnIndexes[i];
+                    var cell = row.GetCell(sourceCol, MissingCellPolicy.RETURN_BLANK_AS_NULL);
+
                     if (cell != null && !string.IsNullOrWhiteSpace(cell.ToString()))
                     {
                         isEmpty = false;
                     }
 
-                    if (cell != null)
+                    if (cell == null)
                     {
-                        if (c == 0)
+                        continue;
+                    }
+
+                    if (i == 0)
+                    {
+                        // Parse as int for the "Position" column
+                        if (int.TryParse(cell.ToString(), out int pos))
                         {
-                            // Parse as int for the "Position" column
-                            if (int.TryParse(cell.ToString(), out int pos))
-                                dr[c] = pos;
-                            else
-                                dr[c] = DBNull.Value;
+                            dr[i] = pos;
                         }
                         else
                         {
-                            dr[c] = cell.ToString();
+                            dr[i] = DBNull.Value;
                         }
+                    }
+                    else
+                    {
+                        dr[i] = cell.ToString();
                     }
                 }
 
