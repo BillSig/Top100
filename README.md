@@ -127,7 +127,7 @@ Edit `appsettings.json` to customize application behavior:
 ### v1.2.0 (Current)
 **User can update row position of a track**: Editing the row of a row causes affected rows to be updated as well
 
-### v1.1.0 (Current)
+### v1.1.0
 **Major Feature Addition: Full CRUD Support**
 - ➕ **Add Record**: Insert new records at any position with automatic renumbering
 - 🗑️ **Delete Record**: Remove records with confirmation and automatic renumbering
@@ -167,13 +167,20 @@ Edit `appsettings.json` to customize application behavior:
 
 ### Planned Features
 - [ ] **Precise Row Upsertion**: Insert or update at exact position with UI input
-- [ ] **Database Backend**: Option to save data to SQL database instead of Excel
-- [ ] **Export Options**: Export to CSV, JSON formats
+  - Fix bug: click on position 1 -> Press +, add new file at position 10. 
+- [ ] **Associate physical path with GreatestHit**
+  -	Update Greatest Hit model
+	- Set path for videos
+	- Search video path with Band and Song Title to see if there is such a video and link it
+- [ ] **Batch procedure**: Rename physical files according to GreatestHit
+	- Excel should be saved fist
 - [ ] **Sorting**: Column-based sorting in grid
-- [ ] **Undo/Redo**: Operation history management
-- [ ] **Bulk Operations**: Multi-row selection and batch editing
+- [ ] **Export Options**: Export to CSV, JSON formats
 - [ ] **Import from URL**: Auto-fetch video metadata from URLs
 - [ ] **Dark Mode**: Theme support
+- [ ] **Database Backend**: Option to save data to SQL database instead of Excel
+- [ ] **Undo/Redo**: Operation history management
+- [ ] **Bulk Operations**: Multi-row selection and batch editing
 
 ### Known Issues
 - Filters must be cleared before CRUD operations
