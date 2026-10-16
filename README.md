@@ -166,15 +166,14 @@ Edit `appsettings.json` to customize application behavior:
 ## 🔮 Roadmap
 
 ### Planned Features
-- [ ] **Precise Row Upsertion**: Insert or update at exact position with UI input
-  - Fix bug: click on position 1 -> Press +, add new file at position 10. 
+- [X] **Precise Row Upsertion**: Insert or update at exact position with UI input
+  ~~- Fix bug: click on position 1 -> Press +, add new file at position 10. ~~
 - [ ] **Associate physical path with GreatestHit**
   -	Update Greatest Hit model
 	- Set path for videos
 	- Search video path with Band and Song Title to see if there is such a video and link it
 - [ ] **Batch procedure**: Rename physical files according to GreatestHit
 	- Excel should be saved fist
-- [ ] **Sorting**: Column-based sorting in grid
 - [ ] **Export Options**: Export to CSV, JSON formats
 - [ ] **Import from URL**: Auto-fetch video metadata from URLs
 - [ ] **Dark Mode**: Theme support

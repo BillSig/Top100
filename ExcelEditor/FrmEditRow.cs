@@ -30,7 +30,7 @@ namespace ExcelEditor
                 nudPosition.Enabled = false;
             }
 
-            if (currentGreatestHit != null) 
+            if (currentGreatestHit != null)
             {
                 ShowCurrentGreatestHit();
             }
@@ -44,6 +44,7 @@ namespace ExcelEditor
             txtSongTitle.Text = _CurrentGreatestHit.SongTitle;
             txtVideoLink.Text = _CurrentGreatestHit.VideoLink;
             chkIsViewed.Checked = _CurrentGreatestHit.IsViewed;
+            txtFilePath.Text = _CurrentGreatestHit.FilePath;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -64,12 +65,38 @@ namespace ExcelEditor
             _CurrentGreatestHit.SongTitle = txtSongTitle.Text;
             _CurrentGreatestHit.VideoLink = txtVideoLink.Text;
             _CurrentGreatestHit.IsViewed = chkIsViewed.Checked;
+            _CurrentGreatestHit.FilePath = txtFilePath.Text;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult= DialogResult.Cancel; 
+            DialogResult = DialogResult.Cancel;
             Close();
+        }
+
+        private void txtFilePath_Click(object sender, EventArgs e)
+        {
+            BrowseFilePath(txtFilePath, "Select file");
+        }
+
+        private void BrowseFilePath(TextBox textBox, string prompt)
+        {
+            using var dialog = new OpenFileDialog
+            {
+                Title = prompt,
+                Filter = "Media Files|*.mp3;*.wav;*.wma;*.aac;*.m4a;*.flac;*.ogg;*.opus;*.aiff;*.aif;*.mp4;*.m4v;*.mkv;*.avi;*.mov;*.wmv;*.mpeg;*.mpg;*.webm;*.3gp|" +
+                         "Audio Files|*.mp3;*.wav;*.wma;*.aac;*.m4a;*.flac;*.ogg;*.opus;*.aiff;*.aif|" +
+                         "Video Files|*.mp4;*.m4v;*.mkv;*.avi;*.mov;*.wmv;*.mpeg;*.mpg;*.webm;*.3gp|" +
+                         "All Files (*.*)|*.*",
+                FilterIndex = 1,
+                CheckFileExists = true,
+                Multiselect = false
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                txtFilePath.Text = dialog.FileName;
+            }
         }
     }
 }

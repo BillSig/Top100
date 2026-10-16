@@ -12,6 +12,7 @@ namespace ExcelEditorLibrary.Models
         public string BandName { get; set; }
         public string SongTitle { get; set; }
         public string VideoLink { get; set; }
+        public string FilePath { get; set; }
         public bool IsViewed { get; set; }
     }
 }

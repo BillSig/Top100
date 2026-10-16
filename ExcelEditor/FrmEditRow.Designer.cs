@@ -40,6 +40,8 @@
             btnOK = new Button();
             btnCancel = new Button();
             nudPosition = new NumericUpDown();
+            lblFilePath = new Label();
+            txtFilePath = new TextBox();
             ((System.ComponentModel.ISupportInitialize)nudPosition).BeginInit();
             SuspendLayout();
             // 
@@ -68,7 +70,7 @@
             txtBandName.AcceptsTab = true;
             txtBandName.Location = new Point(276, 12);
             txtBandName.Name = "txtBandName";
-            txtBandName.Size = new Size(407, 27);
+            txtBandName.Size = new Size(604, 27);
             txtBandName.TabIndex = 3;
             // 
             // lblBandName
@@ -85,7 +87,7 @@
             txtSongTitle.AcceptsTab = true;
             txtSongTitle.Location = new Point(276, 54);
             txtSongTitle.Name = "txtSongTitle";
-            txtSongTitle.Size = new Size(407, 27);
+            txtSongTitle.Size = new Size(604, 27);
             txtSongTitle.TabIndex = 5;
             // 
             // lblSongTitle
@@ -102,7 +104,7 @@
             txtVideoLink.AcceptsTab = true;
             txtVideoLink.Location = new Point(276, 101);
             txtVideoLink.Name = "txtVideoLink";
-            txtVideoLink.Size = new Size(407, 27);
+            txtVideoLink.Size = new Size(604, 27);
             txtVideoLink.TabIndex = 7;
             // 
             // lblVideoLink
@@ -126,7 +128,7 @@
             // 
             // btnOK
             // 
-            btnOK.Location = new Point(489, 144);
+            btnOK.Location = new Point(686, 204);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(94, 29);
             btnOK.TabIndex = 9;
@@ -136,7 +138,7 @@
             // 
             // btnCancel
             // 
-            btnCancel.Location = new Point(589, 144);
+            btnCancel.Location = new Point(786, 204);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(94, 29);
             btnCancel.TabIndex = 10;
@@ -151,12 +153,33 @@
             nudPosition.Size = new Size(51, 27);
             nudPosition.TabIndex = 11;
             // 
+            // lblFilePath
+            // 
+            lblFilePath.AutoSize = true;
+            lblFilePath.Location = new Point(158, 151);
+            lblFilePath.Name = "lblFilePath";
+            lblFilePath.Size = new Size(66, 20);
+            lblFilePath.TabIndex = 12;
+            lblFilePath.Text = "File path";
+            // 
+            // txtFilePath
+            // 
+            txtFilePath.AcceptsTab = true;
+            txtFilePath.Location = new Point(276, 148);
+            txtFilePath.Name = "txtFilePath";
+            txtFilePath.ReadOnly = true;
+            txtFilePath.Size = new Size(604, 27);
+            txtFilePath.TabIndex = 13;
+            txtFilePath.Click += txtFilePath_Click;
+            // 
             // FrmEditRow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(695, 181);
+            ClientSize = new Size(892, 247);
             ControlBox = false;
+            Controls.Add(txtFilePath);
+            Controls.Add(lblFilePath);
             Controls.Add(nudPosition);
             Controls.Add(btnCancel);
             Controls.Add(btnOK);
@@ -192,5 +215,7 @@
         private Button btnOK;
         private Button btnCancel;
         private NumericUpDown nudPosition;
+        private Label lblFilePath;
+        private TextBox txtFilePath;
     }
 }
