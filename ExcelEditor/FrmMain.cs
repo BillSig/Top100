@@ -152,8 +152,9 @@ namespace ExcelEditor
                         BandName = dr[1].ToString(),
                         SongTitle = dr[2].ToString(),
                         VideoLink = dr[3].ToString(),
-                        IsViewed = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1
-                    });
+                        IsViewed = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1,
+                        FilePath = dr[5] is string s && !string.IsNullOrWhiteSpace(s) ? s.Trim() : null
+                    }); 
                 }
                 catch (Exception ex)
                 {
@@ -383,7 +384,8 @@ namespace ExcelEditor
                 table.Rows[tableRowIndex][2] = currentGreatestHit.SongTitle;
                 table.Rows[tableRowIndex][3] = currentGreatestHit.VideoLink;
                 table.Rows[tableRowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
-
+                table.Rows[tableRowIndex][5] = string.IsNullOrWhiteSpace(currentGreatestHit.FilePath) ? null : currentGreatestHit.FilePath;
+                
                 if (positionChanged)
                 {
                     MoveGreatestHit(oldPosition, newPosition);
@@ -450,6 +452,7 @@ namespace ExcelEditor
                 row[2] = hit.SongTitle;
                 row[3] = hit.VideoLink;
                 row[4] = hit.IsViewed ? 1 : 0;
+                row[5] = string.IsNullOrWhiteSpace(hit.FilePath) ? null : hit.FilePath;
                 table.Rows.Add(row);
             }
         }
@@ -461,6 +464,7 @@ namespace ExcelEditor
             table.Rows[tableRowIndex][2] = hit.SongTitle;
             table.Rows[tableRowIndex][3] = hit.VideoLink;
             table.Rows[tableRowIndex][4] = hit.IsViewed ? 1 : 0;
+            table.Rows[tableRowIndex][5] = string.IsNullOrWhiteSpace(hit.FilePath) ? null : hit.FilePath;
         }
 
         private void MarkChangedRange(int startRowIndex, int endRowIndex, bool changed)
@@ -545,12 +549,13 @@ namespace ExcelEditor
                 for (int c = 0; c < table.Columns.Count; c++)
                 {
                     // Set the cell of the row with the value of the in-memory cell value.
-                    // If the cell doesn't exist, nothing happens.
-                    row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                    
+                    //// If the cell doesn't exist, nothing happens.
+                    //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
 
-                    //// If you want to include creation of cells that didn't exist, replace above line of code with the following:
-                    //var cell = row.GetCell(c) ?? row.CreateCell(c);
-                    //cell.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
+                    // If the cell doesn't exist it is first created
+                    var cell = row.GetCell(c) ?? row.CreateCell(c);
+                    cell.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
                 }
 
                 // overwrite file

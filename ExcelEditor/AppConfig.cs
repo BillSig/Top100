@@ -9,7 +9,7 @@ namespace ExcelEditor
     public class AppConfig
     {
         public int MaxGreatestHitsCounter { get; set; } = 500;
-        public int ColumnsCounter { get; set; } = 5;
+        public int ColumnsCounter { get; set; } = 6;
         public bool SaveToExcelInstantly { get; set; }
         public bool UpdatePosition { get; set; }
     }
