@@ -81,6 +81,15 @@ namespace ExcelEditor
 
         private void BrowseFilePath(TextBox textBox, string prompt)
         {
+            string initialDir = string.Empty;
+            string initialFile = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                initialDir = Path.GetDirectoryName(textBox.Text);
+                initialFile = Path.GetFileName(textBox.Text);
+            }
+
             using var dialog = new OpenFileDialog
             {
                 Title = prompt,
@@ -90,12 +99,14 @@ namespace ExcelEditor
                          "All Files (*.*)|*.*",
                 FilterIndex = 1,
                 CheckFileExists = true,
-                Multiselect = false
+                Multiselect = false,
+                InitialDirectory = !string.IsNullOrEmpty(initialDir) && Directory.Exists(initialDir) ? initialDir : string.Empty,
+                FileName = initialFile
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                txtFilePath.Text = dialog.FileName;
+                textBox.Text = dialog.FileName;
             }
         }
     }
