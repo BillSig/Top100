@@ -31,6 +31,7 @@
             pnlTop = new Panel();
             lblFileName = new Label();
             pnlFilter = new Panel();
+            btnUpdateFilepaths = new Button();
             btnDelete = new Button();
             btnAdd = new Button();
             btnClear = new Button();
@@ -77,6 +78,7 @@
             // 
             // pnlFilter
             // 
+            pnlFilter.Controls.Add(btnUpdateFilepaths);
             pnlFilter.Controls.Add(btnDelete);
             pnlFilter.Controls.Add(btnAdd);
             pnlFilter.Controls.Add(btnClear);
@@ -96,6 +98,17 @@
             pnlFilter.Name = "pnlFilter";
             pnlFilter.Size = new Size(1242, 111);
             pnlFilter.TabIndex = 6;
+            // 
+            // btnUpdateFilepaths
+            // 
+            btnUpdateFilepaths.Anchor = AnchorStyles.Top;
+            btnUpdateFilepaths.Location = new Point(498, 79);
+            btnUpdateFilepaths.Name = "btnUpdateFilepaths";
+            btnUpdateFilepaths.Size = new Size(139, 29);
+            btnUpdateFilepaths.TabIndex = 15;
+            btnUpdateFilepaths.Text = "Update filepaths";
+            btnUpdateFilepaths.UseVisualStyleBackColor = true;
+            btnUpdateFilepaths.Click += btnUpdateFilepaths_Click;
             // 
             // btnDelete
             // 
@@ -326,5 +339,6 @@
         private Button btnClear;
         private Button btnDelete;
         private Button btnAdd;
+        private Button btnUpdateFilepaths;
     }
 }

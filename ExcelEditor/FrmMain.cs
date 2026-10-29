@@ -154,7 +154,7 @@ namespace ExcelEditor
                         VideoLink = dr[3].ToString(),
                         IsViewed = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1,
                         FilePath = dr[5] is string s && !string.IsNullOrWhiteSpace(s) ? s.Trim() : null
-                    }); 
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -385,7 +385,7 @@ namespace ExcelEditor
                 table.Rows[tableRowIndex][3] = currentGreatestHit.VideoLink;
                 table.Rows[tableRowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
                 table.Rows[tableRowIndex][5] = string.IsNullOrWhiteSpace(currentGreatestHit.FilePath) ? null : currentGreatestHit.FilePath;
-                
+
                 if (positionChanged)
                 {
                     MoveGreatestHit(oldPosition, newPosition);
@@ -437,7 +437,7 @@ namespace ExcelEditor
                     greatestHits[i - 1].Position = i;
                 }
             }
-            
+
         }
 
         private void RebuildTableFromGreatestHits()
@@ -549,7 +549,7 @@ namespace ExcelEditor
                 for (int c = 0; c < table.Columns.Count; c++)
                 {
                     // Set the cell of the row with the value of the in-memory cell value.
-                    
+
                     //// If the cell doesn't exist, nothing happens.
                     //row.GetCell(c)?.SetCellValue(table.Rows[rowIndex][c]?.ToString() ?? "");
 
@@ -690,6 +690,7 @@ namespace ExcelEditor
             btnClear.Enabled = !isFirstRun;
             btnAdd.Enabled = !isFirstRun;
             btnDelete.Enabled = !isFirstRun;
+            btnUpdateFilepaths.Enabled = !isFirstRun;
         }
 
         private void UpdateArrows(bool isRowSelected)
@@ -1138,6 +1139,11 @@ namespace ExcelEditor
                     }
                 }
             }
+        }
+
+        private void btnUpdateFilepaths_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Procedure is not implemented yet!", "Info", MessageBoxButtons.OK);
         }
     }
 }
