@@ -48,11 +48,15 @@
             lblBand = new Label();
             txtFileName = new TextBox();
             pnlMain = new Panel();
+            pnlProgress = new Panel();
+            pgbUpdateFilepaths = new ProgressBar();
+            lblProgressStatus = new Label();
             grdMain = new DataGridView();
             openFileDialog1 = new OpenFileDialog();
             pnlTop.SuspendLayout();
             pnlFilter.SuspendLayout();
             pnlMain.SuspendLayout();
+            pnlProgress.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)grdMain).BeginInit();
             SuspendLayout();
             // 
@@ -266,12 +270,39 @@
             // 
             // pnlMain
             // 
+            pnlMain.Controls.Add(pnlProgress);
             pnlMain.Controls.Add(grdMain);
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(0, 154);
             pnlMain.Name = "pnlMain";
             pnlMain.Size = new Size(1242, 451);
             pnlMain.TabIndex = 1;
+            // 
+            // pnlProgress
+            // 
+            pnlProgress.Controls.Add(pgbUpdateFilepaths);
+            pnlProgress.Controls.Add(lblProgressStatus);
+            pnlProgress.Dock = DockStyle.Bottom;
+            pnlProgress.Location = new Point(0, 408);
+            pnlProgress.Name = "pnlProgress";
+            pnlProgress.Size = new Size(1242, 43);
+            pnlProgress.TabIndex = 1;
+            // 
+            // pgbUpdateFilepaths
+            // 
+            pgbUpdateFilepaths.Dock = DockStyle.Right;
+            pgbUpdateFilepaths.Location = new Point(192, 0);
+            pgbUpdateFilepaths.Name = "pgbUpdateFilepaths";
+            pgbUpdateFilepaths.Size = new Size(1050, 43);
+            pgbUpdateFilepaths.TabIndex = 1;
+            // 
+            // lblProgressStatus
+            // 
+            lblProgressStatus.AutoSize = true;
+            lblProgressStatus.Location = new Point(22, 11);
+            lblProgressStatus.Name = "lblProgressStatus";
+            lblProgressStatus.Size = new Size(0, 20);
+            lblProgressStatus.TabIndex = 0;
             // 
             // grdMain
             // 
@@ -312,6 +343,8 @@
             pnlFilter.ResumeLayout(false);
             pnlFilter.PerformLayout();
             pnlMain.ResumeLayout(false);
+            pnlProgress.ResumeLayout(false);
+            pnlProgress.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)grdMain).EndInit();
             ResumeLayout(false);
         }
@@ -340,5 +373,8 @@
         private Button btnDelete;
         private Button btnAdd;
         private Button btnUpdateFilepaths;
+        private Panel pnlProgress;
+        private ProgressBar pgbUpdateFilepaths;
+        private Label lblProgressStatus;
     }
 }

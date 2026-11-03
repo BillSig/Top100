@@ -1,4 +1,6 @@
+using ExcelEditorLibrary.Abstractions;
 using ExcelEditorLibrary.Models;
+using ExcelEditorLibrary.Services;
 using NPOI.SS.UserModel;
 using Serilog;
 using System.Data;
@@ -33,11 +35,17 @@ namespace ExcelEditor
             {
                 UpdateButtons(false, true);
                 UpdateArrows(false);
+                EnableProgressPanel(false);
             }
             else
             {
                 Close(); // Close app if config cannot be loaded
             }
+        }
+
+        private void EnableProgressPanel(bool enable)
+        {
+            pnlProgress.Visible = enable;
         }
 
         private void ShowVersion()
@@ -1141,9 +1149,103 @@ namespace ExcelEditor
             }
         }
 
-        private void btnUpdateFilepaths_Click(object sender, EventArgs e)
+        private async void btnUpdateFilepaths_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Procedure is not implemented yet!", "Info", MessageBoxButtons.OK);
+            if (greatestHits.Count == 0)
+            {
+                MessageBox.Show("There are no loaded items to update.", "Nothing to Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using var folderDlg = new FolderBrowserDialog
+            {
+                Description = "Select the folder containing the video/audio files."
+            };
+            if (folderDlg.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            var matchableItems = greatestHits
+                .OfType<IHasSearchableFilePath>()
+                .ToList();
+
+            if (matchableItems.Count == 0)
+            {
+                MessageBox.Show("Loaded items do not support file path matching.", "Not Supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SetUpdateFilepathsUiState(true, matchableItems.Count);
+
+            // Progress<T> is constructed on the UI thread (inside the click handler, before Task.Run) and it captures the current SynchronizationContext.
+            // When Report() is called from the background thread inside FilePathMatcher,
+            // the callback is automatically marshaled back onto the UI thread:
+            // no manual Invoke/BeginInvoke needed, and no risk of cross-thread control access exceptions.
+            var progress = new Progress<int>(processedCount =>
+            {
+                pgbUpdateFilepaths.Value = Math.Min(processedCount, pgbUpdateFilepaths.Maximum);
+                lblProgressStatus.Text = $"Updating file paths... ({processedCount}/{matchableItems.Count})";
+            });
+
+            FilePathMatchResult result;
+            try
+            {
+                // Task.Run offloads the matching work (FilePathMatcher.UpdateFilePaths, which does file-system enumeration + comparisons) to a thread-pool thread,
+                // keeping the UI thread free to repaint the progress bar and stay responsive
+                // async/await instead of raw BackgroundWorker keeps the method readable as a linear sequence
+                // and avoids the extra event-wiring boilerplate BackgroundWorker requires, while still achieving the same non-blocking behavior. 
+                var matcher = new FilePathMatcher();
+                result = await Task.Run(() =>
+                    matcher.UpdateFilePaths(matchableItems, folderDlg.SelectedPath, progress));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error while updating file paths from folder {Folder}", folderDlg.SelectedPath);
+                MessageBox.Show($"An error occurred while updating file paths: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetUpdateFilepathsUiState(false, 0);
+                return;
+            }
+
+            // Reuses the existing in-memory list -> DataTable sync mechanism.
+            RebuildTableFromGreatestHits();
+            grdMain.Refresh();
+
+            if (result.MatchedCount > 0)
+            {
+                hasUnsavedChanges = true;
+            }
+
+            SetUpdateFilepathsUiState(false, 0);
+            UpdateButtons(hasUnsavedChanges, false);
+
+            string summary = $"File path update completed.{Environment.NewLine}" +
+                              $"Matched: {result.MatchedCount}{Environment.NewLine}" +
+                              $"Unmatched: {result.UnmatchedCount}";
+
+            MessageBox.Show(summary, "Update File Paths", MessageBoxButtons.OK, result.UnmatchedCount > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+        }
+
+        private void SetUpdateFilepathsUiState(bool isRunning, int total)
+        {
+            pnlProgress.Visible = isRunning;
+            pgbUpdateFilepaths.Minimum = 0;
+            pgbUpdateFilepaths.Maximum = Math.Max(total, 1);
+            pgbUpdateFilepaths.Value = 0;
+            lblProgressStatus.Text = isRunning ? "Updating file paths..." : string.Empty;
+
+            // Prevent other mutating actions while the background operation runs.
+            btnOpen.Enabled = !isRunning;
+            btnSave.Enabled = !isRunning && hasUnsavedChanges;
+            btnDiscard.Enabled = !isRunning && hasUnsavedChanges;
+            btnAdd.Enabled = !isRunning;
+            btnDelete.Enabled = !isRunning;
+            btnFilter.Enabled = !isRunning;
+            btnClear.Enabled = !isRunning;
+            btnMoveUp.Enabled = !isRunning && btnMoveUp.Enabled;
+            btnMoveDown.Enabled = !isRunning && btnMoveDown.Enabled;
+            btnUpdateFilepaths.Enabled = !isRunning;
+            grdMain.Enabled = !isRunning;
         }
     }
 }
