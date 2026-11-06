@@ -11,7 +11,7 @@ Excel Editor is a desktop application designed to manage a curated list of favor
 
 ## ✨ Features
 
-### Current Version (v1.1)
+### Current Version (v2.0.3)
 - ✅ **Full CRUD Operations**: Create, Read, Update, and Delete records
 - ✅ **Row Reordering**: Move songs up/down with visual feedback
 - ✅ **Advanced Filtering**: Filter by band name, song title, and viewed status
@@ -21,6 +21,7 @@ Excel Editor is a desktop application designed to manage a curated list of favor
 - ✅ **Excel Format Support**: Compatible with `.xls` and `.xlsx` files
 - ✅ **Logging**: Integrated Serilog for debugging and error tracking
 - ✅ **Splash Screen**: Professional startup experience
+- ✅ **Match filepaths against a preselected folder**: Select a folder with songs and match them with the Greatest Hits list
 
 ### Data Model
 Each record contains:
@@ -124,7 +125,11 @@ Edit `appsettings.json` to customize application behavior:
 
 ## 📚 Version History
 
-### v1.2.0 (Current)
+### v2.0.3 (Current)
+**A file path is associated to Greatest Hit**, so that a link can be made to the actual video file (if provided by the user)
+**Procedure to match filepaths against a preselected folder.** User can now select a folder with music songs and videos and match the name of the songs against the list of Greatest Hits.
+
+### v1.2.0
 **User can update row position of a track**: Editing the row of a row causes affected rows to be updated as well
 
 ### v1.1.0
