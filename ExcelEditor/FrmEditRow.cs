@@ -100,5 +100,10 @@ namespace ExcelEditor
                 textBox.Text = dialog.FileName;
             }
         }
+
+        private void btnClearFilePath_Click(object sender, EventArgs e)
+        {
+            txtFilePath.Text = null;
+        }
     }
 }

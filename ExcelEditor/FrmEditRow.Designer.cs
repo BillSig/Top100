@@ -42,6 +42,7 @@
             nudPosition = new NumericUpDown();
             lblFilePath = new Label();
             txtFilePath = new TextBox();
+            btnClearFilePath = new Button();
             ((System.ComponentModel.ISupportInitialize)nudPosition).BeginInit();
             SuspendLayout();
             // 
@@ -172,12 +173,23 @@
             txtFilePath.TabIndex = 13;
             txtFilePath.Click += txtFilePath_Click;
             // 
+            // btnClearFilePath
+            // 
+            btnClearFilePath.Location = new Point(243, 147);
+            btnClearFilePath.Name = "btnClearFilePath";
+            btnClearFilePath.Size = new Size(27, 29);
+            btnClearFilePath.TabIndex = 14;
+            btnClearFilePath.Text = "X";
+            btnClearFilePath.UseVisualStyleBackColor = true;
+            btnClearFilePath.Click += btnClearFilePath_Click;
+            // 
             // FrmEditRow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(892, 247);
             ControlBox = false;
+            Controls.Add(btnClearFilePath);
             Controls.Add(txtFilePath);
             Controls.Add(lblFilePath);
             Controls.Add(nudPosition);
@@ -217,5 +229,6 @@
         private NumericUpDown nudPosition;
         private Label lblFilePath;
         private TextBox txtFilePath;
+        private Button btnClearFilePath;
     }
 }
