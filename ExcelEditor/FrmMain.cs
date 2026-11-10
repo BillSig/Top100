@@ -631,9 +631,17 @@ namespace ExcelEditor
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            SaveGridToExcel(excelPath, false);
+        }
+
+        private void SaveGridToExcel(string excelPath, bool mute)
+        {
             if (SaveGridToExcel(excelPath))
             {
-                MessageBox.Show("Excel file saved successfully!", "Success", MessageBoxButtons.OK);
+                if (!mute)
+                {
+                    MessageBox.Show("Excel file saved successfully!", "Success", MessageBoxButtons.OK);
+                }
 
                 UpdateButtons(false, false);
                 foreach (DataGridViewRow row in grdMain.Rows)
@@ -1151,6 +1159,8 @@ namespace ExcelEditor
 
         private async void btnUpdateFilepaths_Click(object sender, EventArgs e)
         {
+            bool userAlreadySavedExcelFile = false;
+
             if (greatestHits.Count == 0)
             {
                 MessageBox.Show("There are no loaded items to update.", "Nothing to Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1164,6 +1174,24 @@ namespace ExcelEditor
             if (folderDlg.ShowDialog() != DialogResult.OK)
             {
                 return;
+            }
+
+            // Excel file should be saved before procedure is launched.
+            if (hasUnsavedChanges)
+            {
+                if (MessageBox.Show("Excel is not saved! It will be saved before the procedure starts!", 
+                    "Excel is not saved", 
+                    MessageBoxButtons.OKCancel, 
+                    MessageBoxIcon.Question) == DialogResult.OK)
+                {
+                    SaveGridToExcel(excelPath, true);
+                    userAlreadySavedExcelFile = true;
+                }
+                else
+                {
+                    // User decided to cancel the procedure
+                    return;
+                }
             }
 
             var matchableItems = greatestHits
@@ -1211,7 +1239,7 @@ namespace ExcelEditor
             RebuildTableFromGreatestHits();
             grdMain.Refresh();
 
-            if (result.MatchedCount > 0)
+            if (result.MatchedCount > 0 && !userAlreadySavedExcelFile)
             {
                 hasUnsavedChanges = true;
             }
