@@ -34,7 +34,7 @@ namespace ExcelEditor
             txtBandName.Text = _CurrentGreatestHit.BandName;
             txtSongTitle.Text = _CurrentGreatestHit.SongTitle;
             txtVideoLink.Text = _CurrentGreatestHit.VideoLink;
-            chkIsViewed.Checked = _CurrentGreatestHit.IsViewed;
+            chkIsLocked.Checked = _CurrentGreatestHit.IsLocked;
             txtFilePath.Text = _CurrentGreatestHit.FilePath;
         }
 
@@ -55,7 +55,7 @@ namespace ExcelEditor
             _CurrentGreatestHit.BandName = txtBandName.Text;
             _CurrentGreatestHit.SongTitle = txtSongTitle.Text;
             _CurrentGreatestHit.VideoLink = txtVideoLink.Text;
-            _CurrentGreatestHit.IsViewed = chkIsViewed.Checked;
+            _CurrentGreatestHit.IsLocked = chkIsLocked.Checked;
             _CurrentGreatestHit.FilePath = txtFilePath.Text;
         }
 

@@ -36,7 +36,7 @@
             lblSongTitle = new Label();
             txtVideoLink = new TextBox();
             lblVideoLink = new Label();
-            chkIsViewed = new CheckBox();
+            chkIsLocked = new CheckBox();
             btnOK = new Button();
             btnCancel = new Button();
             nudPosition = new NumericUpDown();
@@ -117,15 +117,15 @@
             lblVideoLink.TabIndex = 6;
             lblVideoLink.Text = "Video Link";
             // 
-            // chkIsViewed
+            // chkIsLocked
             // 
-            chkIsViewed.AutoSize = true;
-            chkIsViewed.Location = new Point(22, 102);
-            chkIsViewed.Name = "chkIsViewed";
-            chkIsViewed.Size = new Size(136, 24);
-            chkIsViewed.TabIndex = 8;
-            chkIsViewed.Text = "Is Video Present";
-            chkIsViewed.UseVisualStyleBackColor = true;
+            chkIsLocked.AutoSize = true;
+            chkIsLocked.Location = new Point(10, 149);
+            chkIsLocked.Name = "chkIsLocked";
+            chkIsLocked.Size = new Size(149, 24);
+            chkIsLocked.TabIndex = 8;
+            chkIsLocked.Text = "Is Filepath Locked";
+            chkIsLocked.UseVisualStyleBackColor = true;
             // 
             // btnOK
             // 
@@ -195,7 +195,7 @@
             Controls.Add(nudPosition);
             Controls.Add(btnCancel);
             Controls.Add(btnOK);
-            Controls.Add(chkIsViewed);
+            Controls.Add(chkIsLocked);
             Controls.Add(txtVideoLink);
             Controls.Add(lblVideoLink);
             Controls.Add(txtSongTitle);
@@ -223,7 +223,7 @@
         private Label lblSongTitle;
         private TextBox txtVideoLink;
         private Label lblVideoLink;
-        private CheckBox chkIsViewed;
+        private CheckBox chkIsLocked;
         private Button btnOK;
         private Button btnCancel;
         private NumericUpDown nudPosition;

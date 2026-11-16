@@ -41,7 +41,7 @@
             btnDiscard = new Button();
             btnSave = new Button();
             btnOpen = new Button();
-            chkIsViewed = new CheckBox();
+            chkIsLocked = new CheckBox();
             txtSong = new TextBox();
             lblSong = new Label();
             txtBand = new TextBox();
@@ -92,7 +92,7 @@
             pnlFilter.Controls.Add(btnDiscard);
             pnlFilter.Controls.Add(btnSave);
             pnlFilter.Controls.Add(btnOpen);
-            pnlFilter.Controls.Add(chkIsViewed);
+            pnlFilter.Controls.Add(chkIsLocked);
             pnlFilter.Controls.Add(txtSong);
             pnlFilter.Controls.Add(lblSong);
             pnlFilter.Controls.Add(txtBand);
@@ -213,18 +213,18 @@
             btnOpen.UseVisualStyleBackColor = true;
             btnOpen.Click += btnOpen_Click;
             // 
-            // chkIsViewed
+            // chkIsLocked
             // 
-            chkIsViewed.AutoSize = true;
-            chkIsViewed.Checked = true;
-            chkIsViewed.CheckState = CheckState.Indeterminate;
-            chkIsViewed.Location = new Point(22, 81);
-            chkIsViewed.Name = "chkIsViewed";
-            chkIsViewed.Size = new Size(233, 24);
-            chkIsViewed.TabIndex = 4;
-            chkIsViewed.Text = "Video is viewed / downoladed";
-            chkIsViewed.ThreeState = true;
-            chkIsViewed.UseVisualStyleBackColor = true;
+            chkIsLocked.AutoSize = true;
+            chkIsLocked.Checked = true;
+            chkIsLocked.CheckState = CheckState.Indeterminate;
+            chkIsLocked.Location = new Point(22, 81);
+            chkIsLocked.Name = "chkIsLocked";
+            chkIsLocked.Size = new Size(146, 24);
+            chkIsLocked.TabIndex = 4;
+            chkIsLocked.Text = "Filepath is locked";
+            chkIsLocked.ThreeState = true;
+            chkIsLocked.UseVisualStyleBackColor = true;
             // 
             // txtSong
             // 
@@ -357,7 +357,7 @@
         private OpenFileDialog openFileDialog1;
         private TextBox txtFileName;
         private Panel pnlFilter;
-        private CheckBox chkIsViewed;
+        private CheckBox chkIsLocked;
         private TextBox txtSong;
         private Label lblSong;
         private TextBox txtBand;

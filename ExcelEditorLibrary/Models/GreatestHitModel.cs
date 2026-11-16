@@ -14,7 +14,7 @@ namespace ExcelEditorLibrary.Models
         public string SongTitle { get; set; }
         public string VideoLink { get; set; }
         public string FilePath { get; set; }
-        public bool IsViewed { get; set; }
+        public bool IsLocked { get; set; }
 
         public IEnumerable<string> GetSearchTokens()
         {

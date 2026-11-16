@@ -160,7 +160,7 @@ namespace ExcelEditor
                         BandName = dr[1].ToString(),
                         SongTitle = dr[2].ToString(),
                         VideoLink = dr[3].ToString(),
-                        IsViewed = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1,
+                        IsLocked = dr[4] != DBNull.Value && Convert.ToInt32(dr[4]) == 1,
                         FilePath = dr[5] is string s && !string.IsNullOrWhiteSpace(s) ? s.Trim() : null
                     });
                 }
@@ -391,7 +391,7 @@ namespace ExcelEditor
                 table.Rows[tableRowIndex][1] = currentGreatestHit.BandName;
                 table.Rows[tableRowIndex][2] = currentGreatestHit.SongTitle;
                 table.Rows[tableRowIndex][3] = currentGreatestHit.VideoLink;
-                table.Rows[tableRowIndex][4] = currentGreatestHit.IsViewed ? 1 : 0;
+                table.Rows[tableRowIndex][4] = currentGreatestHit.IsLocked ? 1 : 0;
                 table.Rows[tableRowIndex][5] = string.IsNullOrWhiteSpace(currentGreatestHit.FilePath) ? null : currentGreatestHit.FilePath;
 
                 if (positionChanged)
@@ -459,7 +459,7 @@ namespace ExcelEditor
                 row[1] = hit.BandName;
                 row[2] = hit.SongTitle;
                 row[3] = hit.VideoLink;
-                row[4] = hit.IsViewed ? 1 : 0;
+                row[4] = hit.IsLocked ? 1 : 0;
                 row[5] = string.IsNullOrWhiteSpace(hit.FilePath) ? null : hit.FilePath;
                 table.Rows.Add(row);
             }
@@ -471,7 +471,7 @@ namespace ExcelEditor
             table.Rows[tableRowIndex][1] = hit.BandName;
             table.Rows[tableRowIndex][2] = hit.SongTitle;
             table.Rows[tableRowIndex][3] = hit.VideoLink;
-            table.Rows[tableRowIndex][4] = hit.IsViewed ? 1 : 0;
+            table.Rows[tableRowIndex][4] = hit.IsLocked ? 1 : 0;
             table.Rows[tableRowIndex][5] = string.IsNullOrWhiteSpace(hit.FilePath) ? null : hit.FilePath;
         }
 
@@ -529,7 +529,7 @@ namespace ExcelEditor
                 BandName = selectedRow[1],
                 SongTitle = selectedRow[2],
                 VideoLink = selectedRow[3],
-                IsViewed = int.Parse(selectedRow[4]) == 1
+                IsLocked = int.Parse(selectedRow[4]) == 1
             };
 
             return currentGreatestHit;
@@ -701,7 +701,7 @@ namespace ExcelEditor
 
             txtBand.Enabled = !isFirstRun;
             txtSong.Enabled = !isFirstRun;
-            chkIsViewed.Enabled = !isFirstRun;
+            chkIsLocked.Enabled = !isFirstRun;
             btnFilter.Enabled = !isFirstRun;
             btnClear.Enabled = !isFirstRun;
             btnAdd.Enabled = !isFirstRun;
@@ -832,24 +832,24 @@ namespace ExcelEditor
             var tempBand = greatestHits[indexA].BandName;
             var tempSong = greatestHits[indexA].SongTitle;
             var tempVideo = greatestHits[indexA].VideoLink;
-            var tempViewed = greatestHits[indexA].IsViewed;
+            var tempLocked = greatestHits[indexA].IsLocked;
 
             greatestHits[indexA].BandName = greatestHits[indexB].BandName;
             greatestHits[indexA].SongTitle = greatestHits[indexB].SongTitle;
             greatestHits[indexA].VideoLink = greatestHits[indexB].VideoLink;
-            greatestHits[indexA].IsViewed = greatestHits[indexB].IsViewed;
+            greatestHits[indexA].IsLocked = greatestHits[indexB].IsLocked;
 
             greatestHits[indexB].BandName = tempBand;
             greatestHits[indexB].SongTitle = tempSong;
             greatestHits[indexB].VideoLink = tempVideo;
-            greatestHits[indexB].IsViewed = tempViewed;
+            greatestHits[indexB].IsLocked = tempLocked;
         }
 
         private void btnFilter_Click(object sender, EventArgs e)
         {
             if (!hasUnsavedChanges)
             {
-                FilterTable(txtBand.Text, txtSong.Text, chkIsViewed.CheckState);
+                FilterTable(txtBand.Text, txtSong.Text, chkIsLocked.CheckState);
             }
             else
             {
@@ -882,12 +882,12 @@ namespace ExcelEditor
         {
             txtBand.Text = string.Empty;
             txtSong.Text = string.Empty;
-            chkIsViewed.CheckState = CheckState.Indeterminate;
+            chkIsLocked.CheckState = CheckState.Indeterminate;
 
-            FilterTable(txtBand.Text, txtSong.Text, chkIsViewed.CheckState);
+            FilterTable(txtBand.Text, txtSong.Text, chkIsLocked.CheckState);
         }
 
-        private void FilterTable(string band, string song, CheckState isViewedState)
+        private void FilterTable(string band, string song, CheckState isLockedState)
         {
             var filters = new List<string>();
 
@@ -897,10 +897,10 @@ namespace ExcelEditor
             if (!string.IsNullOrWhiteSpace(song))
                 filters.Add($"Song LIKE '%{song.Replace("'", "''")}%'");
 
-            if (isViewedState == CheckState.Checked)
-                filters.Add("[Viewed Data] = 1");
-            else if (isViewedState == CheckState.Unchecked)
-                filters.Add("[Viewed Data] = 0");
+            if (isLockedState == CheckState.Checked)
+                filters.Add("[Locked] = 1");
+            else if (isLockedState == CheckState.Unchecked)
+                filters.Add("[Locked] = 0");
 
             string filterString = string.Join(" AND ", filters);
 
@@ -968,7 +968,7 @@ namespace ExcelEditor
                 BandName = string.Empty,
                 SongTitle = string.Empty,
                 VideoLink = string.Empty,
-                IsViewed = false
+                IsLocked = false
             };
 
             // Show edit form for the new row
@@ -992,7 +992,7 @@ namespace ExcelEditor
                 newDataRow[1] = newHit.BandName;
                 newDataRow[2] = newHit.SongTitle;
                 newDataRow[3] = newHit.VideoLink;
-                newDataRow[4] = newHit.IsViewed ? 1 : 0;
+                newDataRow[4] = newHit.IsLocked ? 1 : 0;
 
                 table.Rows.InsertAt(newDataRow, insertPosition - 1);
 
