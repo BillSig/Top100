@@ -69,7 +69,7 @@ Edit `appsettings.json` to customize application behavior:
 
 ### Editing a Record
 1. **Double-click** any row to open the edit dialog
-2. Modify fields (Position is read-only)
+2. Modify fields (including Position since v2.0)
 3. Click **OK** to stage changes or **Cancel** to discard
 4. Modified rows appear with **yellow background**
 5. Click **Update** to save or **Discard** to revert
@@ -92,6 +92,7 @@ Edit `appsettings.json` to customize application behavior:
 2. Use **Up** ↑ or **Down** ↓ arrow buttons
 3. Rows swap positions (Position column remains sequential)
 4. Click **Update** to save changes
+5. Alternatively, open a row by double clicking on it and change the Position.
 
 ### Filtering Records
 1. Enter search terms in:
@@ -100,6 +101,17 @@ Edit `appsettings.json` to customize application behavior:
    - **Viewed** checkbox (Checked/Unchecked/Indeterminate)
 2. Click **Filter** to apply
 3. Click **Clear** to reset filters
+
+### Associating file path to Greatest Hit
+1. Open a Greatest Hit by double clicking on it.
+2. Click on File Path to select a media file and click OK
+3. Click **OK** to update the record
+
+### Associating file path to Greatest Hit (Bulk)
+1. Load an excel file
+2. Click on **Update Filepaths** button
+3. Select a path where audio and video files exist and click **OK**
+4. Application will search the selected files and match them with **Band** and **Song Title** of the Greatest Hits
 
 > **Note:** Editing, reordering, adding, and deleting are disabled while filters are active. Clear filters first.
 

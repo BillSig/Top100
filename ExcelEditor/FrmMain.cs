@@ -504,7 +504,7 @@ namespace ExcelEditor
 
         private void UpdateUIRow(int rowIndex, bool recordhasChanged)
         {
-            hasUnsavedChanges = recordhasChanged;
+             hasUnsavedChanges = recordhasChanged;
             UpdateButtons(recordhasChanged, false);
             if (recordhasChanged)
             {
