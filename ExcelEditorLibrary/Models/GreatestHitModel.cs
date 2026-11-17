@@ -20,5 +20,10 @@ namespace ExcelEditorLibrary.Models
         {
             return new[] { BandName, SongTitle };
         }
+
+        public void OnFilePathMatched()
+        {
+            IsLocked = true;
+        }
     }
 }

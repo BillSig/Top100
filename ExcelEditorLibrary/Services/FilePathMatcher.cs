@@ -56,6 +56,7 @@ namespace ExcelEditorLibrary.Services
                 if (match != null)
                 {
                     item.FilePath = match.Path;
+                    item.OnFilePathMatched();
                     result.MatchedCount++;
                 }
                 else

@@ -25,8 +25,10 @@ namespace ExcelEditorLibrary.Tests
         {
             public string[] Tokens { get; set; }
             public string FilePath { get; set; }
+            public bool WasMatchedCallbackInvoked { get; private set; }
 
             public IEnumerable<string> GetSearchTokens() => Tokens;
+            public void OnFilePathMatched() => WasMatchedCallbackInvoked = true;
         }
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace ExcelEditorLibrary.Tests
             // Assert
             Assert.Equal(filePath, item.FilePath);
             Assert.Equal(1, result.MatchedCount);
+            Assert.True(item.WasMatchedCallbackInvoked);
             Assert.Equal(0, result.UnmatchedCount);
         }
 
@@ -81,6 +84,7 @@ namespace ExcelEditorLibrary.Tests
             Assert.Null(item.FilePath);
             Assert.Equal(0, result.MatchedCount);
             Assert.Equal(1, result.UnmatchedCount);
+            Assert.False(item.WasMatchedCallbackInvoked);
             Assert.Contains("Queen - Another One Bites The Dust", result.UnmatchedDescriptions);
         }
 

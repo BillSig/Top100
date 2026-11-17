@@ -1195,7 +1195,7 @@ namespace ExcelEditor
             }
 
             // Only greatest hits that are not locked, participate in FilePath Updating
-            var viewedHits = greatestHits.Where(hit => hit.IsLocked).ToList();
+            var viewedHits = greatestHits.Where(hit => !hit.IsLocked).ToList();
             if (viewedHits.Count == 0)
             {
                 MessageBox.Show("There are no items marked as viewed to update.", "Nothing to Update", MessageBoxButtons.OK, MessageBoxIcon.Information);

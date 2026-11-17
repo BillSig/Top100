@@ -17,5 +17,11 @@
         /// Full path of the matched file. Set by the matching process.
         /// </summary>
         string FilePath { get; set; }
+
+        /// <summary>
+        /// Called by the matcher after FilePath has been set to a matching file.
+        /// Lets each model apply its own side effects (e.g. flag the item as locked).
+        /// </summary>
+        void OnFilePathMatched();
     }
 }
